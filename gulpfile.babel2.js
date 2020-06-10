@@ -1,27 +1,27 @@
-const fs = require('fs');
-const gulp = require('gulp');
-const sass = require('gulp-sass');
-const sourcemaps = require('gulp-sourcemaps');
-const del = require('del');
-const rename = require('gulp-rename');
-const plumber = require('gulp-plumber');
-const postcss = require('gulp-postcss');
-const cssNano = require('cssnano');
-const server = require('browser-sync');
-const autoprefixer = require('autoprefixer');
-const gulpZip = require('gulp-zip');
-const include = require('gulp-include');
-const concat = require('gulp-concat');
-const pathNpm = require('path');
-const imagemin = require('gulp-imagemin');
-const webp = require('gulp-webp');
-const imgCompress = require('imagemin-jpeg-recompress');
-const webpHTML = require('gulp-webp-html');
-const webpcss = require('gulp-webpcss');
-const svgSprite = require('gulp-svg-sprite');
-const ttf2woff = require('gulp-ttf2woff');
-const ttf2woff2 = require('gulp-ttf2woff2');
-const otf2woff = require('gulp-fonter');
+// import fs from 'fs';
+import gulp from 'gulp';
+import sass from 'gulp-sass';
+import sourcemaps from 'gulp-sourcemaps';
+import del from 'del';
+import rename from 'gulp-rename';
+import plumber from 'gulp-plumber';
+import postcss from 'gulp-postcss';
+import cssNano from 'cssnano';
+import server from 'browser-sync';
+import autoprefixer from 'autoprefixer';
+import gulpZip from 'gulp-zip';
+import include from 'gulp-include';
+import concat from 'gulp-concat';
+import pathNpm from 'path';
+import imagemin from 'gulp-imagemin';
+import webp from 'gulp-webp';
+import imgCompress from 'imagemin-jpeg-recompress';
+import webpHTML from 'gulp-webp-html';
+import webpcss from 'gulp-webpcss';
+import svgSprite from 'gulp-svg-sprite';
+import ttf2woff from 'gulp-ttf2woff';
+import ttf2woff2 from 'gulp-ttf2woff2';
+import otf2woff from 'gulp-fonter';
 
 const name = pathNpm.basename(__dirname);
 
@@ -67,23 +67,10 @@ const path = {
   zipFolder: 'C:/Users/Alex/Documents/artyom/webdev/залить',
 };
 
-// const css = () => gulp.src(path.src.css)
-//   .pipe(plumber())
-//   .pipe(sourcemaps.init())
-//   .pipe(sass({
-//     outputStyle: 'expanded',
-//     includePaths: [`${__dirname}/node_modules`],
-//   }))
-//   .pipe(postcss([autoprefixer()]))
-//   .pipe(webpcss())
-//   .pipe(gulp.dest(path.build.css))
-//   .pipe(rename({
-//     extname: '.min.css'
-//   }))
-//   .pipe(postcss([cssNano()]))
-//   .pipe(sourcemaps.write('.'))
-//   .pipe(gulp.dest(path.build.css))
-//   .pipe(server.stream());
+// const processpres = [
+//   autoprefixer,
+//   cssNano,
+// ];
 
 const css = () => gulp.src(path.src.css)
   .pipe(plumber())
@@ -94,6 +81,11 @@ const css = () => gulp.src(path.src.css)
   }))
   .pipe(postcss([autoprefixer()]))
   .pipe(webpcss())
+  .pipe(gulp.dest(path.build.css))
+  .pipe(rename({
+    extname: '.min.css'
+  }))
+  .pipe(postcss([cssNano()]))
   .pipe(sourcemaps.write('.'))
   .pipe(gulp.dest(path.build.css))
   .pipe(server.stream());
