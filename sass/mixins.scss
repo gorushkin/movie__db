@@ -1,0 +1,57 @@
+@mixin desktop-full {
+  @media (max-width: $desktop-full) {
+    @content;
+  }
+}
+
+@mixin desktop {
+  @media (max-width: $desktop-full - 1) {
+    @content;
+  }
+}
+
+@mixin laptop {
+  @media (max-width: $desktop-width - 1px) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: $laptop-width - 1px) {
+    @content;
+  }
+}
+
+@mixin wide-mobile {
+  @media (max-width: $tablet-width - 1px) {
+    @content;
+  }
+}
+
+@mixin mobile {
+  @media (max-width: $mobile-width - 1px) {
+    @content;
+  }
+}
+
+@mixin retina {
+  @media (min-resolution: $retina-dpi), (min-resolution: $retina-dppx) {
+    @content;
+  }
+}
+
+@mixin underline {
+  box-shadow: inset 0 -2px 0 -1px currentColor;
+}
+
+@mixin desktop-wide {
+  @media (min-width: $desktop-wide) {
+    @content;
+  }
+}
+
+@mixin desktop-large {
+  @media (max-width: $desktop-wide - 1px) {
+    @content;
+  }
+}
