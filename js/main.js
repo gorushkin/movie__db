@@ -45,7 +45,7 @@ const DBservice = class {
         fullData.push(...nextPageResults.results)
       }
     };
-    console.log(fullData);
+
     const rebuildActions = {
       movieList: ({
         id,
@@ -115,11 +115,76 @@ const DBservice = class {
   }
 }
 
+const Movie = class {
+  constructor(id, title, popularity, genre_ids, overview, poster_path, backdrop_path, release_data, vote_average) {
+    this.id = id;
+    this.title = title;
+    this.popularity = popularity;
+    this.genre_ids = genre_ids;
+    this.overview = overview;
+    this.poster_path = poster_path;
+    this.backdrop_path = backdrop_path;
+    this.release_data = release_data;
+    this.vote_averag = vote_average;
+  }
+
+  getNoPosterImgPath = () => 'img/No_image_available.svg';
+  getApiKey = () => '20ba111713def543aaca200d5d47a284';
+  getUrl = () => 'https://image.tmdb.org/t/p/w185_and_h278_bestv2';
+  getImgPath = (poster_path) => {
+    const posterImg = (poster_path) ? this.getUrl() + poster_path : this.getNoPosterImgPath();
+    return posterImg;
+  }
+
+  renderMovieCard = () => {
+    const card = document.createElement('li');
+    card.classList.add('movies__item');
+    card.innerHTML = `
+        <a href="#" class="movies__card card">
+          <img src="${this.getImgPath(this.poster_path)}" alt="${this.title}" class="card__img">
+          <h3 class="card__title">${this.title}</h3>
+        </a>
+    `;
+    return card;
+  }
+}
+
 const form = document.querySelector('.header__form');
+const moviesList = document.querySelector('.movies__list');
+// const filterTypeList = document.querySelector('.filter__type-list')
+const filters = document.querySelector('.filters')
+
+const renderSearchResult = (state) => {
+  // localStorage.setItem('state', JSON.stringify(state));
+  moviesList.textContent = '';
+  const fragment = document.createDocumentFragment();
+  state.movieList.forEach(({
+    id,
+    title,
+    popularity,
+    genre_ids,
+    overview,
+    poster_path,
+    backdrop_path,
+    release_data,
+    vote_average
+  }) => {
+    const movie = new Movie(id, title, popularity, genre_ids, overview, poster_path, backdrop_path, release_data, vote_average);
+    fragment.append(movie.renderMovieCard());
+  });
+  moviesList.append(fragment);
+}
 
 const getData = (query, state) => {
-  const movieList = new DBservice().getMovieList(query).then(console.log);
-  const tvShowList = new DBservice().getTvShowList(query).then(console.log);
+  if (localStorage.state) {
+    renderSearchResult(JSON.parse(localStorage.getItem('state')))
+  } else {
+    const movieList = new DBservice().getMovieList(query).then((data) => state.movieList = data);
+    const tvShowList = new DBservice().getTvShowList(query).then((data) => state.tvShowList = data);
+    Promise.all([movieList, tvShowList]).then(() => {
+      localStorage.setItem('state', JSON.stringify(state));
+      renderSearchResult(state)});
+  }
 }
 
 const formHandler = (state) => (e) => {
@@ -130,15 +195,50 @@ const formHandler = (state) => (e) => {
   getData(searchValue);
 }
 
+const filtersActions = {
+  type: (state) => {
+
+  },
+  popularity: () => {},
+  date: () => {},
+}
+
+const setActiveFilter = (filterName, filterType) => {
+  const elements = document.querySelectorAll(`[data-name="${filterName}"]`);
+  elements.forEach((element) => {
+    element.classList.remove('filter__link--active');
+    if (element.dataset.type === filterType) {
+      element.classList.add('filter__link--active');
+    }
+  })
+}
+
+const filtersClickHandle = (state) => (e) => {
+  e.preventDefault();
+  const target = e.target.closest('.filter__link');
+  const filterName = target.dataset.name;
+  const filterType = target.dataset.type;
+  state.sorting[filterName] = filterType;
+  filtersActions[filterName](state);
+  setActiveFilter(filterName, filterType);
+}
+
 const app = () => {
   const state = {
     language: 'ru-Ru',
     movieList: [],
     tvShowList: [],
+    activeTab: 'movieList',
+    sorting: {
+      popularity: 'up',
+      date: 'new',
+      type: 'movieList',
+    }
   }
 
   form.addEventListener('submit', formHandler(state));
   getData('hulk', state);
+  filters.addEventListener('click', filtersClickHandle(state));
 }
 
 app();

@@ -21,18 +21,39 @@
   <main class="main">
     <section class="filters">
       <div class="wrapper">
-        <div class="filter filter--popularity">
-          <h2 class="filter__title">По популярности</h2>
-          <ul class="filter__popularity-list">
-            <li class="popularity-item"><a class="filter__link" href="">Популярные</a></li>
-            <li class="popularity-item"><a class="filter__link" href="">Непопулярные</a></li>
-          </ul>
+        <div class="filter__row">
+          <div class="filter filter--popularity">
+            <h2 class="filter__title">По популярности</h2>
+            <ul class="filter__popularity-list">
+              <li class="popularity-item">
+                <a data-name="popularity" data-type="more" class="filter__link" href="">Популярные</a>
+              </li>
+              <li class="popularity-item">
+                <a data-name="popularity" data-type="less" class="filter__link" href="">Непопулярные</a>
+              </li>
+            </ul>
+          </div>
+          <div class="filter filter--date">
+            <h2 class="filter__title">По дате выпуска</h2>
+            <ul class="filter__date-list">
+              <li class="filter__date-item">
+                <a data-name="date" data-type="new" class="filter__link" href="">Новые</a>
+              </li>
+              <li class="filter__date-item">
+                <a data-name="date" data-type="old" class="filter__link" href="">Старые</a>
+              </li>
+            </ul>
+          </div>
         </div>
-        <div class="filter filter--date">
-          <h2 class="filter__title">По дате выпуска</h2>
-          <ul class="filter__date-list">
-            <li class="filter__date-item"><a class="filter__link" href="">Новые</a></li>
-            <li class="filter__date-item"><a class="filter__link" href="">Старые</a></li>
+        <div class="filter filter--type">
+          <!-- <h2 class="filter__title">По дате выпуска</h2> -->
+          <ul class="filter__type-list">
+            <li class="filter__type-item">
+              <a data-name="type" data-type="movieList" class="filter__link" href="">Movies</a>
+            </li>
+            <li class="filter__type-item">
+              <a data-name="type" data-type="tvShowList" class="filter__link" href="">TV Shows</a>
+            </li>
           </ul>
         </div>
       </div>
@@ -40,36 +61,19 @@
 
     <section class="movies">
       <div class="wrapper">
-        <ul class="movies__list">
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-          <li class="movies__item card"></li>
-        </ul>
+        <div class="movies__result">
+          <!-- <h2 class="movies__title">
+            Movies
+          </h2> -->
+          <ul class="movies__list">
+            
+          </ul>
+        </div>
       </div>
     </section>
   </main>
   <script src="js/main.js"></script>
+  <!-- <script src="js/vendor.js"></script> -->
   
 </body>
 
