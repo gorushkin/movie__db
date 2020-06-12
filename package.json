@@ -31,6 +31,7 @@
     "browser-sync": "^2.26.7",
     "cssnano": "^4.1.10",
     "del": "^5.1.0",
+    "dummyjs": "^1.1.7",
     "eslint": "^6.6.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-config-htmlacademy": "^0.5.2",
