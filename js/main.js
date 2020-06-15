@@ -125,7 +125,7 @@ const Movie = class {
     this.poster_path = poster_path;
     this.backdrop_path = backdrop_path;
     this.release_data = release_data;
-    this.vote_averag = vote_average;
+    this.vote_average = vote_average;
   }
 
   getNoPosterImgPath = () => 'img/No_image_available.svg';
@@ -139,8 +139,10 @@ const Movie = class {
   renderMovieCard = () => {
     const card = document.createElement('li');
     card.classList.add('movies__item');
+    const voteElem = (this.vote_average) ? `<span class="card__vote">${this.vote_average}</span>` : ''
     card.innerHTML = `
-        <a href="#" class="movies__card card">
+    <a href="#" class="movies__card card">
+          ${voteElem}
           <img src="${this.getImgPath(this.poster_path)}" alt="${this.title}" class="card__img">
           <h3 class="card__title">${this.title}</h3>
         </a>
