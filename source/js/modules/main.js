@@ -1,22 +1,22 @@
 const DBservice = class {
-  constructor() {
-    this.rebuildActions = {
-      movieList: (n) => {
-        'movieList',
-        n.original_name,
-        n.id,
-        n.popularity,
-        n.backdrop_path
-      },
-      tvShowList: (n) => {
-        'tvShowList',
-        n.title,
-        n.id,
-        n.popularity,
-        backdrop_path
-      },
-    }
-  }
+  // constructor() {
+  //   this.rebuildActions = {
+  //     movieList: (n) => {
+  //       'movieList',
+  //       n.original_name,
+  //       n.id,
+  //       n.popularity,
+  //       n.backdrop_path
+  //     },
+  //     tvShowList: (n) => {
+  //       'tvShowList',
+  //       n.title,
+  //       n.id,
+  //       n.popularity,
+  //       backdrop_path
+  //     },
+  //   }
+  // }
   getData = async (url) => {
     const res = await fetch(url);
     if (res.ok) {
@@ -55,7 +55,7 @@ const DBservice = class {
         overview,
         poster_path,
         backdrop_path,
-        release_data,
+        release_date,
         vote_average
       }) => ({
         type: 'movieList',
@@ -66,7 +66,7 @@ const DBservice = class {
         overview,
         poster_path,
         backdrop_path,
-        release_data,
+        release_date,
         vote_average
       }),
       tvShowList: ({
@@ -77,7 +77,8 @@ const DBservice = class {
         overview,
         popularity,
         poster_path,
-        vote_average
+        vote_average,
+        first_air_date
       }) => ({
         type: 'tvShowList',
         id,
@@ -87,9 +88,11 @@ const DBservice = class {
         overview,
         popularity,
         poster_path,
-        vote_average
+        vote_average,
+        release_date: first_air_date
       }),
     }
+    // console.log(fullData);
     const modifiedData = fullData.map((n) => {
       return rebuildActions[type](n);
     })
@@ -116,7 +119,7 @@ const DBservice = class {
 }
 
 const Movie = class {
-  constructor(id, title, popularity, genre_ids, overview, poster_path, backdrop_path, release_data, vote_average) {
+  constructor(id, title, popularity, genre_ids, overview, poster_path, backdrop_path, release_date, vote_average) {
     this.id = id;
     this.title = title;
     this.popularity = popularity;
@@ -124,7 +127,7 @@ const Movie = class {
     this.overview = overview;
     this.poster_path = poster_path;
     this.backdrop_path = backdrop_path;
-    this.release_data = release_data;
+    this.release_date = release_date;
     this.vote_average = vote_average;
   }
 
@@ -154,7 +157,6 @@ const Movie = class {
 const form = document.querySelector('.header__form');
 const moviesList = document.querySelector('.movies__list');
 const tvShowsList = document.querySelector('.tvshows__list');
-// const filterTypeList = document.querySelector('.filter__type-list')
 const filters = document.querySelector('.filters');
 const resultTabs = document.querySelectorAll('.search__result');
 
@@ -168,40 +170,21 @@ const tempFunc = (itemList) => {
     overview,
     poster_path,
     backdrop_path,
-    release_data,
+    release_date,
     vote_average
   }) => {
-    const movie = new Movie(id, title, popularity, genre_ids, overview, poster_path, backdrop_path, release_data, vote_average);
+    const movie = new Movie(id, title, popularity, genre_ids, overview, poster_path, backdrop_path, release_date, vote_average);
     fragment.append(movie.renderMovieCard());
   });
   return fragment;
 }
 
 const renderSearchResult = (state) => {
+  console.log(state);
   moviesList.textContent = '';
   tvShowsList.textContent = '';
   moviesList.append(tempFunc(state.movieList));
   tvShowsList.append(tempFunc(state.tvShowList));
-}
-
-const getData = (query, state) => {
-  if (localStorage.state) {
-    renderSearchResult(JSON.parse(localStorage.getItem('state')))
-  } else {
-    const movieList = new DBservice().getMovieList(query).then((data) => state.movieList = data);
-    const tvShowList = new DBservice().getTvShowList(query).then((data) => state.tvShowList = data);
-    Promise.all([movieList, tvShowList]).then(() => {
-      localStorage.setItem('state', JSON.stringify(state));
-      renderSearchResult(state)});
-  }
-}
-
-const formHandler = (state) => (e) => {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  const searchValue = formData.get('search').trim();
-  form.elements.search.value = '';
-  getData(searchValue);
 }
 
 const filtersActions = {
@@ -212,10 +195,54 @@ const filtersActions = {
         tab.classList.add('search__result--active');
       }
     })
-
   },
-  popularity: () => {},
-  date: () => {},
+  popularity: (state) => {
+    switch (state.sorting.popularity) {
+      case 'more':
+        state[state.sorting.type].sort((b, a) => {
+          return (a.vote_average - b.vote_average);
+        })
+        break;
+      case 'less':
+        state[state.sorting.type].sort((a, b) => {
+          return (a.vote_average - b.vote_average);
+        })
+      default:
+        break;
+    }
+    renderSearchResult(state)
+  },
+  date: (state) => {
+    console.log(state[state.sorting.type]);
+    console.log(state.sorting.type);
+    switch (state.sorting.date) {
+      case 'new':
+        state[state.sorting.type].sort((b, a) => {
+          if (b.release_date > a.release_date) {
+            return -1
+          }
+          if (b.release_date < a.release_date) {
+            return 1
+          }
+          return 0
+        })
+        // state[state.sorting.type].sort();
+        break;
+      case 'old':
+        state[state.sorting.type].sort((a, b) => {
+          if (b.release_date > a.release_date) {
+            return -1
+          }
+          if (b.release_date < a.release_date) {
+            return 1
+          }
+          return 0
+        })
+      default:
+        break;
+    }
+    renderSearchResult(state)
+  },
 }
 
 const setActiveFilter = (filterName, filterType) => {
@@ -229,16 +256,36 @@ const setActiveFilter = (filterName, filterType) => {
 }
 
 const filtersClickHandle = (state) => (e) => {
+  // debugger;
   e.preventDefault();
   const target = e.target.closest('.filter__link');
-  const filterName = target.dataset.name;
-  const filterType = target.dataset.type;
-  state.sorting[filterName] = filterType;
-  filtersActions[filterName](state);
-  setActiveFilter(filterName, filterType);
+  if (target) {
+    const filterName = target.dataset.name;
+    const filterType = target.dataset.type;
+    state.sorting[filterName] = filterType;
+    filtersActions[filterName](state);
+    setActiveFilter(filterName, filterType);
+  }
 }
 
 const app = () => {
+  const getData = (query) => {
+    const movieList = new DBservice().getMovieList(query).then((data) => state.movieList = data);
+    const tvShowList = new DBservice().getTvShowList(query).then((data) => state.tvShowList = data);
+    Promise.all([movieList, tvShowList]).then(() => {
+      localStorage.setItem('state', JSON.stringify(state));
+      renderSearchResult(state)
+    });
+  }
+
+  const formHandler = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const searchValue = formData.get('search').trim();
+    form.elements.search.value = '';
+    getData(searchValue);
+  }
+
   const state = {
     language: 'ru-Ru',
     movieList: [],
@@ -251,7 +298,7 @@ const app = () => {
     }
   }
 
-  form.addEventListener('submit', formHandler(state));
+  form.addEventListener('submit', formHandler);
   getData('hulk', state);
   filters.addEventListener('click', filtersClickHandle(state));
 }
