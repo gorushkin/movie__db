@@ -92,7 +92,6 @@ const DBservice = class {
         release_date: first_air_date
       }),
     }
-    // console.log(fullData);
     const modifiedData = fullData.map((n) => {
       return rebuildActions[type](n);
     })
@@ -160,7 +159,7 @@ const tvShowsList = document.querySelector('.tvshows__list');
 const filters = document.querySelector('.filters');
 const resultTabs = document.querySelectorAll('.search__result');
 
-const tempFunc = (itemList) => {
+const generateList = (itemList) => {
   const fragment = document.createDocumentFragment();
   itemList.forEach(({
     id,
@@ -180,11 +179,10 @@ const tempFunc = (itemList) => {
 }
 
 const renderSearchResult = (state) => {
-  console.log(state);
   moviesList.textContent = '';
   tvShowsList.textContent = '';
-  moviesList.append(tempFunc(state.movieList));
-  tvShowsList.append(tempFunc(state.tvShowList));
+  moviesList.append(generateList(state.movieList));
+  tvShowsList.append(generateList(state.tvShowList));
 }
 
 const filtersActions = {
@@ -213,8 +211,6 @@ const filtersActions = {
     renderSearchResult(state)
   },
   date: (state) => {
-    console.log(state[state.sorting.type]);
-    console.log(state.sorting.type);
     switch (state.sorting.date) {
       case 'new':
         state[state.sorting.type].sort((b, a) => {
@@ -226,7 +222,6 @@ const filtersActions = {
           }
           return 0
         })
-        // state[state.sorting.type].sort();
         break;
       case 'old':
         state[state.sorting.type].sort((a, b) => {
@@ -256,7 +251,6 @@ const setActiveFilter = (filterName, filterType) => {
 }
 
 const filtersClickHandle = (state) => (e) => {
-  // debugger;
   e.preventDefault();
   const target = e.target.closest('.filter__link');
   if (target) {
@@ -299,7 +293,7 @@ const app = () => {
   }
 
   form.addEventListener('submit', formHandler);
-  getData('hulk', state);
+  getData('marvel', state);
   filters.addEventListener('click', filtersClickHandle(state));
 }
 
