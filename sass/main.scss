@@ -58,7 +58,6 @@
   &:hover {
     text-decoration: underline;
   }
-
 }
 
 
@@ -66,11 +65,16 @@
   // padding-top: 50px;
 }
 
-.movies__list {
-  display: grid;
+.search__result {
+  // display: grid;
+  display: none;
   grid-template-columns: repeat(auto-fill, 185px);
   grid-gap: 1rem;
   justify-content: space-between;
+
+  &--active {
+    display: grid;
+  }
 }
 
 .movies__item {

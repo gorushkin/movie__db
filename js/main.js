@@ -151,14 +151,14 @@ const Movie = class {
 
 const form = document.querySelector('.header__form');
 const moviesList = document.querySelector('.movies__list');
+const tvShowsList = document.querySelector('.tvshows__list');
 // const filterTypeList = document.querySelector('.filter__type-list')
-const filters = document.querySelector('.filters')
+const filters = document.querySelector('.filters');
+const resultTabs = document.querySelectorAll('.search__result');
 
-const renderSearchResult = (state) => {
-  // localStorage.setItem('state', JSON.stringify(state));
-  moviesList.textContent = '';
+const tempFunc = (itemList) => {
   const fragment = document.createDocumentFragment();
-  state.movieList.forEach(({
+  itemList.forEach(({
     id,
     title,
     popularity,
@@ -172,7 +172,14 @@ const renderSearchResult = (state) => {
     const movie = new Movie(id, title, popularity, genre_ids, overview, poster_path, backdrop_path, release_data, vote_average);
     fragment.append(movie.renderMovieCard());
   });
-  moviesList.append(fragment);
+  return fragment;
+}
+
+const renderSearchResult = (state) => {
+  moviesList.textContent = '';
+  tvShowsList.textContent = '';
+  moviesList.append(tempFunc(state.movieList));
+  tvShowsList.append(tempFunc(state.tvShowList));
 }
 
 const getData = (query, state) => {
@@ -197,6 +204,12 @@ const formHandler = (state) => (e) => {
 
 const filtersActions = {
   type: (state) => {
+    resultTabs.forEach((tab) => {
+      tab.classList.remove('search__result--active');
+      if (tab.id === state.sorting.type) {
+        tab.classList.add('search__result--active');
+      }
+    })
 
   },
   popularity: () => {},
