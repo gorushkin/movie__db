@@ -1,22 +1,4 @@
 const DBservice = class {
-  constructor() {
-    this.rebuildActions = {
-      movieList: (n) => {
-        'movieList',
-        n.original_name,
-        n.id,
-        n.popularity,
-        n.backdrop_path
-      },
-      tvShowList: (n) => {
-        'tvShowList',
-        n.title,
-        n.id,
-        n.popularity,
-        backdrop_path
-      },
-    }
-  }
   getData = async (url) => {
     const res = await fetch(url);
     if (res.ok) {
@@ -55,7 +37,7 @@ const DBservice = class {
         overview,
         poster_path,
         backdrop_path,
-        release_data,
+        release_date,
         vote_average
       }) => ({
         type: 'movieList',
@@ -66,7 +48,7 @@ const DBservice = class {
         overview,
         poster_path,
         backdrop_path,
-        release_data,
+        release_date,
         vote_average
       }),
       tvShowList: ({
@@ -77,7 +59,8 @@ const DBservice = class {
         overview,
         popularity,
         poster_path,
-        vote_average
+        vote_average,
+        first_air_date
       }) => ({
         type: 'tvShowList',
         id,
@@ -87,9 +70,11 @@ const DBservice = class {
         overview,
         popularity,
         poster_path,
-        vote_average
+        vote_average,
+        release_date: first_air_date
       }),
     }
+
     const modifiedData = fullData.map((n) => {
       return rebuildActions[type](n);
     })
@@ -113,10 +98,12 @@ const DBservice = class {
   getNextPage = (page) => {
     return this.getData(`${this.temp}&page=${page}`);
   }
+
+  getItemInfo = (id, language = 'en-US') => this.getData(`${this.getServerPath()}/movie/${id}?api_key=${this.getApiKey()}&language=${language}`)
 }
 
 const Movie = class {
-  constructor(id, title, popularity, genre_ids, overview, poster_path, backdrop_path, release_data, vote_average) {
+  constructor(id, title, popularity, genre_ids, overview, poster_path, backdrop_path, release_date, vote_average) {
     this.id = id;
     this.title = title;
     this.popularity = popularity;
@@ -124,7 +111,7 @@ const Movie = class {
     this.overview = overview;
     this.poster_path = poster_path;
     this.backdrop_path = backdrop_path;
-    this.release_data = release_data;
+    this.release_date = release_date;
     this.vote_average = vote_average;
   }
 
@@ -139,6 +126,7 @@ const Movie = class {
   renderMovieCard = () => {
     const card = document.createElement('li');
     card.classList.add('movies__item');
+    card.dataset.id = this.id;
     const voteElem = (this.vote_average) ? `<span class="card__vote">${this.vote_average}</span>` : ''
     card.innerHTML = `
     <a href="#" class="movies__card card">
@@ -151,14 +139,87 @@ const Movie = class {
   }
 }
 
+const Modal = class {
+  constructor(id, title, poster_path, genres, vote_average, overview, homepage) {
+    this.id = id;
+    this.title = title;
+    this.poster_path = poster_path;
+    this.genres = genres;
+    this.vote_average = vote_average;
+    this.overview = overview;
+    this.homepage = homepage;
+  }
+
+  getNoPosterImgPath = () => 'img/No_image_available.svg';
+  getApiKey = () => '20ba111713def543aaca200d5d47a284';
+  getUrl = () => 'https://image.tmdb.org/t/p/w300_and_h450_bestv2/';
+
+  getImgPath = (poster_path) => {
+    const posterImg = (poster_path) ? this.getUrl() + poster_path : this.getNoPosterImgPath();
+    return posterImg;
+  }
+
+  getGenresList = () => this.genres.reduce((acc, {
+    name
+  }) => `${acc}<li>${name}</li>`, '');
+
+  getHomePage = () => {
+    const homePage = (this.homePage) ? `<a class="modal__link" href="${this.homepage}" target="_blanc">Официальная страница</a>` : '';
+    return homePage
+  }
+
+  renderModal = () => {
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal__content';
+    modalContent.innerHTML = `
+      <div class="modal__poster-wrapper">
+        <img src="${this.getImgPath(this.poster_path)}" alt="" class="modal__poster">
+      </div>
+      <div class="modal__info">
+        <h2 class="modal__title">
+          ${this.title}
+        </h2>
+        <div class="modal__genres">
+          <h3>Жанр:</h3>
+          <ul class="modal__genres-list">
+            ${this.getGenresList()}
+          </ul>
+        </div>
+        <div>
+          <h3>Рейтинг</h3>
+          <span class="modal__rating">${this.vote_average}</span>
+        </div>
+        <div class="header__info">
+          <h3 dir="auto">Обзор: </h3>
+          <div class="overview" dir="auto">
+            <p class="description">
+            ${this.overview}
+            </p>
+          </div>
+          <p class="modal__link-wrapper">
+            ${this.getHomePage()}
+          </p>
+          <div class="modal__close"></div>
+        </div>
+      </div>
+      `
+    return modalContent;
+  }
+
+  showInfo = () => {
+    console.log(this.title, this.id);
+  }
+}
+
 const form = document.querySelector('.header__form');
+const movies = document.querySelector('.movies');
+const modal = document.querySelector('.modal');
 const moviesList = document.querySelector('.movies__list');
 const tvShowsList = document.querySelector('.tvshows__list');
-// const filterTypeList = document.querySelector('.filter__type-list')
 const filters = document.querySelector('.filters');
 const resultTabs = document.querySelectorAll('.search__result');
 
-const tempFunc = (itemList) => {
+const generateList = (itemList) => {
   const fragment = document.createDocumentFragment();
   itemList.forEach(({
     id,
@@ -168,10 +229,10 @@ const tempFunc = (itemList) => {
     overview,
     poster_path,
     backdrop_path,
-    release_data,
+    release_date,
     vote_average
   }) => {
-    const movie = new Movie(id, title, popularity, genre_ids, overview, poster_path, backdrop_path, release_data, vote_average);
+    const movie = new Movie(id, title, popularity, genre_ids, overview, poster_path, backdrop_path, release_date, vote_average);
     fragment.append(movie.renderMovieCard());
   });
   return fragment;
@@ -180,28 +241,8 @@ const tempFunc = (itemList) => {
 const renderSearchResult = (state) => {
   moviesList.textContent = '';
   tvShowsList.textContent = '';
-  moviesList.append(tempFunc(state.movieList));
-  tvShowsList.append(tempFunc(state.tvShowList));
-}
-
-const getData = (query, state) => {
-  if (localStorage.state) {
-    renderSearchResult(JSON.parse(localStorage.getItem('state')))
-  } else {
-    const movieList = new DBservice().getMovieList(query).then((data) => state.movieList = data);
-    const tvShowList = new DBservice().getTvShowList(query).then((data) => state.tvShowList = data);
-    Promise.all([movieList, tvShowList]).then(() => {
-      localStorage.setItem('state', JSON.stringify(state));
-      renderSearchResult(state)});
-  }
-}
-
-const formHandler = (state) => (e) => {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  const searchValue = formData.get('search').trim();
-  form.elements.search.value = '';
-  getData(searchValue);
+  moviesList.append(generateList(state.movieList));
+  tvShowsList.append(generateList(state.tvShowList));
 }
 
 const filtersActions = {
@@ -212,10 +253,51 @@ const filtersActions = {
         tab.classList.add('search__result--active');
       }
     })
-
   },
-  popularity: () => {},
-  date: () => {},
+  popularity: (state) => {
+    switch (state.sorting.popularity) {
+      case 'more':
+        state[state.sorting.type].sort((b, a) => {
+          return (a.vote_average - b.vote_average);
+        })
+        break;
+      case 'less':
+        state[state.sorting.type].sort((a, b) => {
+          return (a.vote_average - b.vote_average);
+        })
+      default:
+        break;
+    }
+    renderSearchResult(state)
+  },
+  date: (state) => {
+    switch (state.sorting.date) {
+      case 'new':
+        state[state.sorting.type].sort((b, a) => {
+          if (b.release_date > a.release_date) {
+            return -1
+          }
+          if (b.release_date < a.release_date) {
+            return 1
+          }
+          return 0
+        })
+        break;
+      case 'old':
+        state[state.sorting.type].sort((a, b) => {
+          if (b.release_date > a.release_date) {
+            return -1
+          }
+          if (b.release_date < a.release_date) {
+            return 1
+          }
+          return 0
+        })
+      default:
+        break;
+    }
+    renderSearchResult(state)
+  },
 }
 
 const setActiveFilter = (filterName, filterType) => {
@@ -231,19 +313,74 @@ const setActiveFilter = (filterName, filterType) => {
 const filtersClickHandle = (state) => (e) => {
   e.preventDefault();
   const target = e.target.closest('.filter__link');
-  const filterName = target.dataset.name;
-  const filterType = target.dataset.type;
-  state.sorting[filterName] = filterType;
-  filtersActions[filterName](state);
-  setActiveFilter(filterName, filterType);
+  if (target) {
+    const filterName = target.dataset.name;
+    const filterType = target.dataset.type;
+    state.sorting[filterName] = filterType;
+    filtersActions[filterName](state);
+    setActiveFilter(filterName, filterType);
+  }
+}
+
+const renderModal = (data) => {
+  const {
+    id,
+    title,
+    poster_path,
+    genres,
+    vote_average,
+    overview,
+    homepage
+  } = data;
+  console.log(data);
+  const modalContent = new Modal(id, title, poster_path, genres, vote_average, overview, homepage);
+  modal.textContent = '';
+  modal.classList.toggle('modal--show')
+  modal.append(modalContent.renderModal());
+  const modalCloseBtn = modal.querySelector('.modal__close');
+  modalCloseBtn.addEventListener('click', (e) => {
+    e.preventDefault();
+    modal.classList.toggle('modal--show')
+  })
 }
 
 const app = () => {
+  const getMovieInfo = () => {
+    new DBservice().getItemInfo(state.currentMovieId).then(renderModal)
+  };
+
+  const itemClickHandler = (e) => {
+    e.preventDefault();
+    const target = e.target.closest('.movies__item');
+    const itemId = target.dataset.id;
+    state.currentMovieId = itemId;
+    getMovieInfo();
+  }
+
+  const getData = (query) => {
+    const movieList = new DBservice().getMovieList(query).then((data) => state.movieList = data);
+    const tvShowList = new DBservice().getTvShowList(query).then((data) => state.tvShowList = data);
+    Promise.all([movieList, tvShowList]).then(() => {
+      localStorage.setItem('state', JSON.stringify(state));
+      renderSearchResult(state)
+    });
+  }
+
+  const formHandler = (e) => {
+    e.preventDefault();
+    const formData = new FormData(e.target);
+    const searchValue = formData.get('search').trim();
+    form.elements.search.value = '';
+    getData(searchValue);
+  }
+
   const state = {
     language: 'ru-Ru',
     movieList: [],
     tvShowList: [],
     activeTab: 'movieList',
+    currentMovieId: null,
+    modal: false,
     sorting: {
       popularity: 'up',
       date: 'new',
@@ -251,9 +388,11 @@ const app = () => {
     }
   }
 
-  form.addEventListener('submit', formHandler(state));
-  getData('hulk', state);
+  form.addEventListener('submit', formHandler);
+  // getData('marvel', state);
   filters.addEventListener('click', filtersClickHandle(state));
+  movies.addEventListener('click', itemClickHandler);
+  // getMovieInfo(284053);
 }
 
 app();
