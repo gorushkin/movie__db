@@ -354,9 +354,15 @@ const renderModal = (data) => {
 }
 
 const app = () => {
-  const getMovieInfo = () => {
+  // const getMovieInfo = () => {
+  //   const itemType = (state.sorting.type === 'movieList') ? 'movie' : 'tv';
+  //   new DBservice().getItemInfo(state.currentMovieId, itemType, state.sorting.type).then(renderModal)
+  // };
+
+  const getMovieInfo = async () => {
     const itemType = (state.sorting.type === 'movieList') ? 'movie' : 'tv';
-    new DBservice().getItemInfo(state.currentMovieId, itemType, state.sorting.type).then(renderModal)
+    const movieInfo = await new DBservice().getItemInfo(state.currentMovieId, itemType, state.sorting.type);
+    renderModal(movieInfo);
   };
 
   const itemClickHandler = (e) => {
@@ -401,7 +407,7 @@ const app = () => {
   }
 
   form.addEventListener('submit', formHandler);
-  getData('marvel', state);
+  // getData('marvel', state);
   filters.addEventListener('click', filtersClickHandle(state));
   movies.addEventListener('click', itemClickHandler);
   // getMovieInfo(284053);
