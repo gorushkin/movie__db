@@ -1,4 +1,52 @@
 const DBservice = class {
+  constructor() {
+    this.rebuildActions = {
+      movieList: ({
+        id,
+        title,
+        popularity,
+        genres,
+        overview,
+        poster_path,
+        backdrop_path,
+        release_date,
+        vote_average
+      }) => ({
+        type: 'movieList',
+        id,
+        title,
+        popularity,
+        genres,
+        overview,
+        poster_path,
+        backdrop_path,
+        release_date,
+        vote_average
+      }),
+      tvShowList: ({
+        id,
+        name,
+        backdrop_path,
+        genres,
+        overview,
+        popularity,
+        poster_path,
+        vote_average,
+        first_air_date
+      }) => ({
+        type: 'tvShowList',
+        id,
+        title: name,
+        backdrop_path,
+        genres,
+        overview,
+        popularity,
+        poster_path,
+        vote_average,
+        release_date: first_air_date
+      }),
+    }
+  }
   getData = async (url) => {
     const res = await fetch(url);
     if (res.ok) {
@@ -7,6 +55,9 @@ const DBservice = class {
       throw new Error(`Не удалось получить данные по адресу ${url}`)
     }
   }
+
+
+
 
   getApiKey = () => '20ba111713def543aaca200d5d47a284';
   getServerPath = () => 'https://api.themoviedb.org/3';
@@ -28,55 +79,10 @@ const DBservice = class {
       }
     };
 
-    const rebuildActions = {
-      movieList: ({
-        id,
-        title,
-        popularity,
-        genre_ids,
-        overview,
-        poster_path,
-        backdrop_path,
-        release_date,
-        vote_average
-      }) => ({
-        type: 'movieList',
-        id,
-        title,
-        popularity,
-        genre_ids,
-        overview,
-        poster_path,
-        backdrop_path,
-        release_date,
-        vote_average
-      }),
-      tvShowList: ({
-        id,
-        name,
-        backdrop_path,
-        genre_ids,
-        overview,
-        popularity,
-        poster_path,
-        vote_average,
-        first_air_date
-      }) => ({
-        type: 'tvShowList',
-        id,
-        title: name,
-        backdrop_path,
-        genre_ids,
-        overview,
-        popularity,
-        poster_path,
-        vote_average,
-        release_date: first_air_date
-      }),
-    }
+
 
     const modifiedData = fullData.map((n) => {
-      return rebuildActions[type](n);
+      return this.rebuildActions[type](n);
     })
     return modifiedData;
   }
@@ -99,15 +105,19 @@ const DBservice = class {
     return this.getData(`${this.temp}&page=${page}`);
   }
 
-  getItemInfo = (id, language = 'en-US') => this.getData(`${this.getServerPath()}/movie/${id}?api_key=${this.getApiKey()}&language=${language}`)
+  getItemInfo = (id, itemType, type, language = 'en-US') => {
+    const result = this.getData(`${this.getServerPath()}/${itemType}/${id}?api_key=${this.getApiKey()}&language=${language}`).then(this.rebuildActions[type]);
+    // const result2 = result.then((data) => console.log(this.rebuildActions[type](data)));
+    return result;
+  }
 }
 
 const Movie = class {
-  constructor(id, title, popularity, genre_ids, overview, poster_path, backdrop_path, release_date, vote_average) {
+  constructor(id, title, popularity, genres, overview, poster_path, backdrop_path, release_date, vote_average) {
     this.id = id;
     this.title = title;
     this.popularity = popularity;
-    this.genre_ids = genre_ids;
+    this.genres = genres;
     this.overview = overview;
     this.poster_path = poster_path;
     this.backdrop_path = backdrop_path;
@@ -225,14 +235,14 @@ const generateList = (itemList) => {
     id,
     title,
     popularity,
-    genre_ids,
+    genres,
     overview,
     poster_path,
     backdrop_path,
     release_date,
     vote_average
   }) => {
-    const movie = new Movie(id, title, popularity, genre_ids, overview, poster_path, backdrop_path, release_date, vote_average);
+    const movie = new Movie(id, title, popularity, genres, overview, poster_path, backdrop_path, release_date, vote_average);
     fragment.append(movie.renderMovieCard());
   });
   return fragment;
@@ -332,7 +342,6 @@ const renderModal = (data) => {
     overview,
     homepage
   } = data;
-  console.log(data);
   const modalContent = new Modal(id, title, poster_path, genres, vote_average, overview, homepage);
   modal.textContent = '';
   modal.classList.toggle('modal--show')
@@ -345,16 +354,25 @@ const renderModal = (data) => {
 }
 
 const app = () => {
-  const getMovieInfo = () => {
-    new DBservice().getItemInfo(state.currentMovieId).then(renderModal)
+  // const getMovieInfo = () => {
+  //   const itemType = (state.sorting.type === 'movieList') ? 'movie' : 'tv';
+  //   new DBservice().getItemInfo(state.currentMovieId, itemType, state.sorting.type).then(renderModal)
+  // };
+
+  const getMovieInfo = async () => {
+    const itemType = (state.sorting.type === 'movieList') ? 'movie' : 'tv';
+    const movieInfo = await new DBservice().getItemInfo(state.currentMovieId, itemType, state.sorting.type);
+    renderModal(movieInfo);
   };
 
   const itemClickHandler = (e) => {
     e.preventDefault();
     const target = e.target.closest('.movies__item');
-    const itemId = target.dataset.id;
-    state.currentMovieId = itemId;
-    getMovieInfo();
+    if (target) {
+      const itemId = target.dataset.id;
+      state.currentMovieId = itemId;
+      getMovieInfo();
+    }
   }
 
   const getData = (query) => {
