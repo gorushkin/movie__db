@@ -229,44 +229,14 @@ const filters = document.querySelector('.filters');
 const resultTabs = document.querySelectorAll('.search__result');
 
 const elements = {
-  moviesList: document.querySelector('.movies__list'),
-  tvShowsList: document.querySelector('.tvshows__list'),
+  movieList: document.querySelector('.movies__list'),
+  tvShowList: document.querySelector('.tvshows__list'),
 }
 
 const app = () => {
-  const generateList = (itemList) => {
-    const fragment = document.createDocumentFragment();
-    itemList.forEach(({
-      id,
-      title,
-      popularity,
-      genres,
-      overview,
-      poster_path,
-      backdrop_path,
-      release_date,
-      vote_average
-    }) => {
-      const movie = new Movie(id, title, popularity, genres, overview, poster_path, backdrop_path, release_date, vote_average);
-      fragment.append(movie.renderMovieCard());
-    });
-    return fragment;
-  }
-
-  const renderPaginationList = (items, listName) => {
-    // const [firstIndex, lastIndex] = getCurrentPageMovieList(data, state);
-  }
-
-  const getCurrentPageMovieList = (state) => {
-    const firstIndex = state.currentPage * state.itemsOnPageCount - state.itemsOnPageCount;
-    const lastDataIndex = state.items.length - 1;
-    const lastIndex = (state.currentPage * state.itemsOnPageCount > lastDataIndex) ? lastDataIndex : state.currentPage * state.itemsOnPageCount - 1;
-    return [firstIndex, lastIndex];
-  }
-
-  const renderList = (state) => {
-    const [firstIndex, lastIndex] = getCurrentPageMovieList(state);
-    elements[state.listName].textContent = '';
+  const renderList = (state, listName) => {
+    const [firstIndex, lastIndex] = [0, 5];
+    elements[listName].textContent = '';
     const fragment = document.createDocumentFragment();
     for (let i = firstIndex; i <= lastIndex; i += 1) {
       const {
@@ -279,18 +249,19 @@ const app = () => {
         backdrop_path,
         release_date,
         vote_average
-      } = state.items[i];
+      } = state[listName][i];
       const movie = new Movie(id, title, popularity, genres, overview, poster_path, backdrop_path, release_date, vote_average);
       fragment.append(movie.renderMovieCard());
-    }
-    elements[state.listName].append(fragment);
+    };
+    elements[listName].append(fragment);
   }
 
 
   const render = (state) => {
-    renderList(state.movieList);
-    renderList(state.tvShowList);
-    renderPaginationList(state.movieList.items, 'moviesList');
+    console.log(state);
+    renderList(state, 'movieList');
+    renderList(state, 'tvShowList');
+
   }
 
   const filtersActions = {
@@ -417,8 +388,8 @@ const app = () => {
   }
 
   const getData = (query) => {
-    const movieList = new DBservice().getMovieList(query, state.sorting.lang).then((data) => state.movieList.items = data);
-    const tvShowList = new DBservice().getTvShowList(query, state.sorting.lang).then((data) => state.tvShowList.items = data);
+    const movieList = new DBservice().getMovieList(query, state.sorting.lang).then((data) => state.movieList = data);
+    const tvShowList = new DBservice().getTvShowList(query, state.sorting.lang).then((data) => state.tvShowList = data);
     Promise.all([movieList, tvShowList]).then(() => {
       localStorage.setItem('state', JSON.stringify(state));
       render(state)
@@ -436,18 +407,10 @@ const app = () => {
 
   const state = {
     language: 'ru-Ru',
-    movieList: {
-      listName: 'moviesList',
-      items: [],
-      itemsOnPageCount: 6,
-      currentPage: 1,
-    },
-    tvShowList: {
-      listName: 'tvShowsList',
-      items: [],
-      itemsOnPageCount: 6,
-      currentPage: 1,
-    },
+    movieList: [],
+    tvShowList: [],
+    currentPage: 1,
+    itemsOnPgeCount: 6,
     activeTab: 'movieList',
     currentMovieId: null,
     query: undefined,
