@@ -1,7 +1,7 @@
 const DBservice = class {
   constructor() {
     this.rebuildActions = {
-      movieList: ({
+      moviesList: ({
         id,
         title,
         popularity,
@@ -13,7 +13,7 @@ const DBservice = class {
         vote_average,
         homepage
       }) => ({
-        type: 'movieList',
+        type: 'moviesList',
         id,
         title,
         popularity,
@@ -25,7 +25,7 @@ const DBservice = class {
         vote_average,
         homepage
       }),
-      tvShowList: ({
+      tvShowsList: ({
         id,
         name,
         backdrop_path,
@@ -37,7 +37,7 @@ const DBservice = class {
         first_air_date,
         homepage
       }) => ({
-        type: 'tvShowList',
+        type: 'tvShowsList',
         id,
         title: name,
         backdrop_path,
@@ -87,17 +87,17 @@ const DBservice = class {
     return modifiedData;
   }
 
-  getMovieList = (query, language) => {
+  getmoviesList = (query, language) => {
     this.temp = `${this.getServerPath()}/search/movie?api_key=${this.getApiKey()}&language=${language}&query=${query}`;
     const result = this.getData(this.temp)
-      .then(this.generateFullData('movieList'))
+      .then(this.generateFullData('moviesList'))
     return result;
   };
 
-  getTvShowList = (query, language) => {
+  gettvShowsList = (query, language) => {
     this.temp = `${this.getServerPath()}/search/tv?api_key=${this.getApiKey()}&language=${language}&query=${query}`;
     const result = this.getData(this.temp)
-      .then(this.generateFullData('tvShowList'))
+      .then(this.generateFullData('tvShowsList'))
     return result;
   };
 
@@ -229,13 +229,46 @@ const filters = document.querySelector('.filters');
 const resultTabs = document.querySelectorAll('.search__result');
 
 const elements = {
-  movieList: document.querySelector('.movies__list'),
-  tvShowList: document.querySelector('.tvshows__list'),
+  moviesList: document.querySelector('.movies__list'),
+  tvShowsList: document.querySelector('.tvshows__list'),
+  moviesPaginationList: document.querySelector('.movies__pagination-list'),
 }
 
 const app = () => {
-  const renderList = (state, listName) => {
-    const [firstIndex, lastIndex] = [0, 5];
+  const buildPaginationItem = (index) => {
+    const pagiationListItem = document.createElement('li');
+    pagiationListItem.innerHTML = `<a href="" data-number="${index}" class="movies__pagination-link">${index}</a>`;
+    pagiationListItem.className = 'movies__pagination-item';
+    return pagiationListItem;
+  }
+
+  const renderPaginationList = (listName) => {
+    elements.moviesPaginationList.textContent = '';
+    const pageCount = Math.ceil(state[listName].length / state.itemsOnPgeCount);
+    const fragment = document.createDocumentFragment();
+    if (pageCount >= 6) {
+      fragment.append(buildPaginationItem(1));
+      for (i = Math.min(pageCount - 3, (Math.max(2, state.currentPage - 1))); i <= Math.max(4, (Math.min(state.currentPage + 1, pageCount - 1))); i += 1) {
+        fragment.append(buildPaginationItem(i));
+      };
+      fragment.append(buildPaginationItem(pageCount));
+    } else {
+      for (let i = 1; i <= pageCount; i += 1) {
+        fragment.append(buildPaginationItem(i));
+      }
+    }
+    elements.moviesPaginationList.append(fragment);
+  }
+
+  const getCurrentPageMovieList = (listName) => {
+    const firstIndex = state.currentPage * state.itemsOnPgeCount - state.itemsOnPgeCount;
+    const lastDataIndex = state[listName].length - 1;
+    const lastIndex = (state.currentPage * state.itemsOnPgeCount > lastDataIndex) ? lastDataIndex : state.currentPage * state.itemsOnPgeCount - 1;
+    return [firstIndex, lastIndex];
+  }
+
+  const renderList = (listName) => {
+    const [firstIndex, lastIndex] = getCurrentPageMovieList(listName);
     elements[listName].textContent = '';
     const fragment = document.createDocumentFragment();
     for (let i = firstIndex; i <= lastIndex; i += 1) {
@@ -257,26 +290,28 @@ const app = () => {
   }
 
 
-  const render = (state) => {
-    console.log(state);
-    renderList(state, 'movieList');
-    renderList(state, 'tvShowList');
-
+  const render = () => {
+    renderList('moviesList');
+    renderList('tvShowsList');
+    renderPaginationList(state.sorting.type);
   }
 
   const filtersActions = {
-    lang: (state) => {
+    lang: () => {
       getData(state.query, state);
     },
-    type: (state) => {
+    type: () => {
       resultTabs.forEach((tab) => {
         tab.classList.remove('search__result--active');
         if (tab.id === state.sorting.type) {
           tab.classList.add('search__result--active');
         }
       })
+      state.currentPage = 1;
+      renderPaginationList(state.sorting.type);
+      renderList(state.sorting.type)
     },
-    popularity: (state) => {
+    popularity: () => {
       switch (state.sorting.popularity) {
         case 'more':
           state[state.sorting.type].sort((b, a) => {
@@ -290,9 +325,9 @@ const app = () => {
         default:
           break;
       }
-      render(state)
+      render()
     },
-    date: (state) => {
+    date: () => {
       switch (state.sorting.date) {
         case 'new':
           state[state.sorting.type].sort((b, a) => {
@@ -318,7 +353,7 @@ const app = () => {
         default:
           break;
       }
-      render(state)
+      render()
     },
   }
 
@@ -332,14 +367,14 @@ const app = () => {
     })
   }
 
-  const filtersClickHandle = (state) => (e) => {
+  const filtersClickHandle = (e) => {
     e.preventDefault();
     const target = e.target.closest('.js__filter');
     if (target) {
       const filterName = target.dataset.name;
       const filterType = target.dataset.type;
       state.sorting[filterName] = filterType;
-      filtersActions[filterName](state);
+      filtersActions[filterName]();
       setActiveFilter(filterName, filterType);
     }
   }
@@ -367,12 +402,12 @@ const app = () => {
   }
 
   // const getMovieInfo = () => {
-  //   const itemType = (state.sorting.type === 'movieList') ? 'movie' : 'tv';
+  //   const itemType = (state.sorting.type === 'moviesList') ? 'movie' : 'tv';
   //   new DBservice().getItemInfo(state.currentMovieId, itemType, state.sorting.type).then(renderModal)
   // };
 
   const getMovieInfo = async () => {
-    const itemType = (state.sorting.type === 'movieList') ? 'movie' : 'tv';
+    const itemType = (state.sorting.type === 'moviesList') ? 'movie' : 'tv';
     const movieInfo = await new DBservice().getItemInfo(state.currentMovieId, itemType, state.sorting.type, state.sorting.lang);
     renderModal(movieInfo);
   };
@@ -388,9 +423,9 @@ const app = () => {
   }
 
   const getData = (query) => {
-    const movieList = new DBservice().getMovieList(query, state.sorting.lang).then((data) => state.movieList = data);
-    const tvShowList = new DBservice().getTvShowList(query, state.sorting.lang).then((data) => state.tvShowList = data);
-    Promise.all([movieList, tvShowList]).then(() => {
+    const moviesList = new DBservice().getmoviesList(query, state.sorting.lang).then((data) => state.moviesList = data);
+    const tvShowsList = new DBservice().gettvShowsList(query, state.sorting.lang).then((data) => state.tvShowsList = data);
+    Promise.all([moviesList, tvShowsList]).then(() => {
       localStorage.setItem('state', JSON.stringify(state));
       render(state)
     });
@@ -407,25 +442,25 @@ const app = () => {
 
   const state = {
     language: 'ru-Ru',
-    movieList: [],
-    tvShowList: [],
-    currentPage: 1,
+    moviesList: [],
+    tvShowsList: [],
+    currentPage: 2,
     itemsOnPgeCount: 6,
-    activeTab: 'movieList',
+    activeTab: 'moviesList',
     currentMovieId: null,
     query: undefined,
     modal: false,
     sorting: {
       popularity: 'up',
       date: 'new',
-      type: 'movieList',
+      type: 'moviesList',
       lang: 'ru-Ru',
     }
   }
 
   form.addEventListener('submit', formHandler);
   getData('marvel', state);
-  filters.addEventListener('click', filtersClickHandle(state));
+  filters.addEventListener('click', filtersClickHandle);
   movies.addEventListener('click', itemClickHandler);
 
 }
