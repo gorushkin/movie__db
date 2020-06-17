@@ -228,6 +228,11 @@ const tvShowsList = document.querySelector('.tvshows__list');
 const filters = document.querySelector('.filters');
 const resultTabs = document.querySelectorAll('.search__result');
 
+const elements = {
+  moviesList: document.querySelector('.movies__list'),
+  tvShowsList: document.querySelector('.tvshows__list'),
+}
+
 const app = () => {
   const generateList = (itemList) => {
     const fragment = document.createDocumentFragment();
@@ -248,11 +253,31 @@ const app = () => {
     return fragment;
   }
 
-  const renderSearchResult = (state) => {
-    moviesList.textContent = '';
-    tvShowsList.textContent = '';
-    moviesList.append(generateList(state.movieList));
-    tvShowsList.append(generateList(state.tvShowList));
+  const renderList = (itemList, listName) => {
+    elements[listName].textContent = '';
+    const fragment = document.createDocumentFragment();
+    itemList.forEach(({
+      id,
+      title,
+      popularity,
+      genres,
+      overview,
+      poster_path,
+      backdrop_path,
+      release_date,
+      vote_average
+    }) => {
+      const movie = new Movie(id, title, popularity, genres, overview, poster_path, backdrop_path, release_date, vote_average);
+      fragment.append(movie.renderMovieCard());
+    });
+    elements[listName].append(fragment);
+  }
+
+
+  const render = (state) => {
+    renderList(state.movieList, 'moviesList');
+    renderList(state.tvShowList, 'tvShowsList');
+
   }
 
   const filtersActions = {
@@ -281,7 +306,7 @@ const app = () => {
         default:
           break;
       }
-      renderSearchResult(state)
+      render(state)
     },
     date: (state) => {
       switch (state.sorting.date) {
@@ -309,7 +334,7 @@ const app = () => {
         default:
           break;
       }
-      renderSearchResult(state)
+      render(state)
     },
   }
 
@@ -383,7 +408,7 @@ const app = () => {
     const tvShowList = new DBservice().getTvShowList(query, state.sorting.lang).then((data) => state.tvShowList = data);
     Promise.all([movieList, tvShowList]).then(() => {
       localStorage.setItem('state', JSON.stringify(state));
-      renderSearchResult(state)
+      render(state)
     });
   }
 
