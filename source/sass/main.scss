@@ -131,7 +131,7 @@
   z-index: 990;
   background-color: #ffffff;
   transform: scaleY(0);
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 
   &--show {
     display: flex;

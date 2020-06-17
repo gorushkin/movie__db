@@ -10,7 +10,8 @@ const DBservice = class {
         poster_path,
         backdrop_path,
         release_date,
-        vote_average
+        vote_average,
+        homepage
       }) => ({
         type: 'movieList',
         id,
@@ -21,7 +22,8 @@ const DBservice = class {
         poster_path,
         backdrop_path,
         release_date,
-        vote_average
+        vote_average,
+        homepage
       }),
       tvShowList: ({
         id,
@@ -32,7 +34,8 @@ const DBservice = class {
         popularity,
         poster_path,
         vote_average,
-        first_air_date
+        first_air_date,
+        homepage
       }) => ({
         type: 'tvShowList',
         id,
@@ -43,7 +46,8 @@ const DBservice = class {
         popularity,
         poster_path,
         vote_average,
-        release_date: first_air_date
+        release_date: first_air_date,
+        homepage
       }),
     }
   }
@@ -174,7 +178,7 @@ const Modal = class {
   }) => `${acc}<li>${name}</li>`, '');
 
   getHomePage = () => {
-    const homePage = (this.homePage) ? `<a class="modal__link" href="${this.homepage}" target="_blanc">Официальная страница</a>` : '';
+    const homePage = (this.homepage) ? `<a class="modal__link" href="${this.homepage}" target="_blanc">Официальная страница</a>` : '';
     return homePage
   }
 
@@ -333,6 +337,7 @@ const filtersClickHandle = (state) => (e) => {
 }
 
 const renderModal = (data) => {
+  console.log(data);
   const {
     id,
     title,
@@ -407,10 +412,9 @@ const app = () => {
   }
 
   form.addEventListener('submit', formHandler);
-  // getData('marvel', state);
+  getData('marvel', state);
   filters.addEventListener('click', filtersClickHandle(state));
   movies.addEventListener('click', itemClickHandler);
-  // getMovieInfo(284053);
 }
 
 app();
