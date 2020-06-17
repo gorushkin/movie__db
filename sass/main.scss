@@ -209,7 +209,6 @@
 
   &::before {
     transform: rotate(45deg) translate(-50%, -50%);
-
   }
 
   &::after {
@@ -218,5 +217,37 @@
 
   &:hover {
     border: 3px solid rgba(124, 124, 124, .5)
+  }
+}
+
+.movies__pagination-list {
+  display: flex;
+  padding: 40px 0;
+}
+
+.movies__pagination-link {
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: 2px solid #948e8e;
+  width: 30px;
+  height: 30px;
+  font-weight: bolder;
+  margin-right: 25px;
+  background: #ffffff;
+  cursor: pointer;
+
+  &.active {
+    outline: 2px solid #000000;
+    color: #ffffff;
+    background: #000000;
+  }
+
+  &:hover,
+  &:focus {
+    color: yellow;
+    background: blue;
+    outline: 2px solid blue;
   }
 }
