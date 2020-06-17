@@ -14,22 +14,31 @@
       <form action="" class="header__form">
         <input type="text" class="header__input" name="search" placeholder="Введите название!">
       </form>
-      <button class="header__btn">En</button>
+
     </div>
   </header>
 
   <main class="main">
     <section class="filters">
       <div class="wrapper">
+          <ul class="filter__lang-list">
+            <li class="lang-item">
+              <a data-name="lang" data-type="ru-RU" class="js__filter filters__btn">Ru</a>
+            </li>
+            <li class="lang-item">
+              <a data-name="lang" data-type="en-US" class="js__filter filters__btn">En</a>
+            </li>
+          </ul>
+          
         <div class="filter__row">
           <div class="filter filter--popularity">
             <h2 class="filter__title">По популярности</h2>
             <ul class="filter__popularity-list">
               <li class="popularity-item">
-                <a data-name="popularity" data-type="more" class="filter__link" href="">Популярные</a>
+                <a data-name="popularity" data-type="more" class="js__filter filter__link" href="">Популярные</a>
               </li>
               <li class="popularity-item">
-                <a data-name="popularity" data-type="less" class="filter__link" href="">Непопулярные</a>
+                <a data-name="popularity" data-type="less" class="js__filter filter__link" href="">Непопулярные</a>
               </li>
             </ul>
           </div>
@@ -37,10 +46,10 @@
             <h2 class="filter__title">По дате выпуска</h2>
             <ul class="filter__date-list">
               <li class="filter__date-item">
-                <a data-name="date" data-type="new" class="filter__link" href="">Новые</a>
+                <a data-name="date" data-type="new" class="js__filter filter__link" href="">Новые</a>
               </li>
               <li class="filter__date-item">
-                <a data-name="date" data-type="old" class="filter__link" href="">Старые</a>
+                <a data-name="date" data-type="old" class="js__filter filter__link" href="">Старые</a>
               </li>
             </ul>
           </div>
@@ -49,10 +58,10 @@
           <!-- <h2 class="filter__title">По дате выпуска</h2> -->
           <ul class="filter__type-list">
             <li class="filter__type-item">
-              <a data-name="type" data-type="movieList" class="filter__link" href="">Movies</a>
+              <a data-name="type" data-type="movieList" class="js__filter filter__link" href="">Movies</a>
             </li>
             <li class="filter__type-item">
-              <a data-name="type" data-type="tvShowList" class="filter__link" href="">TV Shows</a>
+              <a data-name="type" data-type="tvShowList" class="js__filter filter__link" href="">TV Shows</a>
             </li>
           </ul>
         </div>

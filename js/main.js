@@ -10,7 +10,8 @@ const DBservice = class {
         poster_path,
         backdrop_path,
         release_date,
-        vote_average
+        vote_average,
+        homepage
       }) => ({
         type: 'movieList',
         id,
@@ -21,7 +22,8 @@ const DBservice = class {
         poster_path,
         backdrop_path,
         release_date,
-        vote_average
+        vote_average,
+        homepage
       }),
       tvShowList: ({
         id,
@@ -32,7 +34,8 @@ const DBservice = class {
         popularity,
         poster_path,
         vote_average,
-        first_air_date
+        first_air_date,
+        homepage
       }) => ({
         type: 'tvShowList',
         id,
@@ -43,10 +46,12 @@ const DBservice = class {
         popularity,
         poster_path,
         vote_average,
-        release_date: first_air_date
+        release_date: first_air_date,
+        homepage
       }),
     }
   }
+
   getData = async (url) => {
     const res = await fetch(url);
     if (res.ok) {
@@ -56,13 +61,10 @@ const DBservice = class {
     }
   }
 
-
-
-
   getApiKey = () => '20ba111713def543aaca200d5d47a284';
   getServerPath = () => 'https://api.themoviedb.org/3';
 
-  getSearchResult = (query, language = 'en-US') => {
+  getSearchResult = (query, language) => {
     this.temp = `${this.getServerPath()}/search/movie?api_key=${this.getApiKey()}&language=${language}&query=${query}`;
     return this.getData(this.temp);
   };
@@ -79,22 +81,20 @@ const DBservice = class {
       }
     };
 
-
-
     const modifiedData = fullData.map((n) => {
       return this.rebuildActions[type](n);
     })
     return modifiedData;
   }
 
-  getMovieList = (query, language = 'en-US') => {
+  getMovieList = (query, language) => {
     this.temp = `${this.getServerPath()}/search/movie?api_key=${this.getApiKey()}&language=${language}&query=${query}`;
     const result = this.getData(this.temp)
       .then(this.generateFullData('movieList'))
     return result;
   };
 
-  getTvShowList = (query, language = 'en-US') => {
+  getTvShowList = (query, language) => {
     this.temp = `${this.getServerPath()}/search/tv?api_key=${this.getApiKey()}&language=${language}&query=${query}`;
     const result = this.getData(this.temp)
       .then(this.generateFullData('tvShowList'))
@@ -105,9 +105,8 @@ const DBservice = class {
     return this.getData(`${this.temp}&page=${page}`);
   }
 
-  getItemInfo = (id, itemType, type, language = 'en-US') => {
+  getItemInfo = (id, itemType, type, language) => {
     const result = this.getData(`${this.getServerPath()}/${itemType}/${id}?api_key=${this.getApiKey()}&language=${language}`).then(this.rebuildActions[type]);
-    // const result2 = result.then((data) => console.log(this.rebuildActions[type](data)));
     return result;
   }
 }
@@ -174,7 +173,7 @@ const Modal = class {
   }) => `${acc}<li>${name}</li>`, '');
 
   getHomePage = () => {
-    const homePage = (this.homePage) ? `<a class="modal__link" href="${this.homepage}" target="_blanc">Официальная страница</a>` : '';
+    const homePage = (this.homepage) ? `<a class="modal__link" href="${this.homepage}" target="_blanc">Официальная страница</a>` : '';
     return homePage
   }
 
@@ -229,131 +228,135 @@ const tvShowsList = document.querySelector('.tvshows__list');
 const filters = document.querySelector('.filters');
 const resultTabs = document.querySelectorAll('.search__result');
 
-const generateList = (itemList) => {
-  const fragment = document.createDocumentFragment();
-  itemList.forEach(({
-    id,
-    title,
-    popularity,
-    genres,
-    overview,
-    poster_path,
-    backdrop_path,
-    release_date,
-    vote_average
-  }) => {
-    const movie = new Movie(id, title, popularity, genres, overview, poster_path, backdrop_path, release_date, vote_average);
-    fragment.append(movie.renderMovieCard());
-  });
-  return fragment;
-}
+const app = () => {
+  const generateList = (itemList) => {
+    const fragment = document.createDocumentFragment();
+    itemList.forEach(({
+      id,
+      title,
+      popularity,
+      genres,
+      overview,
+      poster_path,
+      backdrop_path,
+      release_date,
+      vote_average
+    }) => {
+      const movie = new Movie(id, title, popularity, genres, overview, poster_path, backdrop_path, release_date, vote_average);
+      fragment.append(movie.renderMovieCard());
+    });
+    return fragment;
+  }
 
-const renderSearchResult = (state) => {
-  moviesList.textContent = '';
-  tvShowsList.textContent = '';
-  moviesList.append(generateList(state.movieList));
-  tvShowsList.append(generateList(state.tvShowList));
-}
+  const renderSearchResult = (state) => {
+    moviesList.textContent = '';
+    tvShowsList.textContent = '';
+    moviesList.append(generateList(state.movieList));
+    tvShowsList.append(generateList(state.tvShowList));
+  }
 
-const filtersActions = {
-  type: (state) => {
-    resultTabs.forEach((tab) => {
-      tab.classList.remove('search__result--active');
-      if (tab.id === state.sorting.type) {
-        tab.classList.add('search__result--active');
+  const filtersActions = {
+    lang: (state) => {
+      getData(state.query, state);
+    },
+    type: (state) => {
+      resultTabs.forEach((tab) => {
+        tab.classList.remove('search__result--active');
+        if (tab.id === state.sorting.type) {
+          tab.classList.add('search__result--active');
+        }
+      })
+    },
+    popularity: (state) => {
+      switch (state.sorting.popularity) {
+        case 'more':
+          state[state.sorting.type].sort((b, a) => {
+            return (a.vote_average - b.vote_average);
+          })
+          break;
+        case 'less':
+          state[state.sorting.type].sort((a, b) => {
+            return (a.vote_average - b.vote_average);
+          })
+        default:
+          break;
+      }
+      renderSearchResult(state)
+    },
+    date: (state) => {
+      switch (state.sorting.date) {
+        case 'new':
+          state[state.sorting.type].sort((b, a) => {
+            if (b.release_date > a.release_date) {
+              return -1
+            }
+            if (b.release_date < a.release_date) {
+              return 1
+            }
+            return 0
+          })
+          break;
+        case 'old':
+          state[state.sorting.type].sort((a, b) => {
+            if (b.release_date > a.release_date) {
+              return -1
+            }
+            if (b.release_date < a.release_date) {
+              return 1
+            }
+            return 0
+          })
+        default:
+          break;
+      }
+      renderSearchResult(state)
+    },
+  }
+
+  const setActiveFilter = (filterName, filterType) => {
+    const elements = document.querySelectorAll(`[data-name="${filterName}"]`);
+    elements.forEach((element) => {
+      element.classList.remove('active');
+      if (element.dataset.type === filterType) {
+        element.classList.add('active');
       }
     })
-  },
-  popularity: (state) => {
-    switch (state.sorting.popularity) {
-      case 'more':
-        state[state.sorting.type].sort((b, a) => {
-          return (a.vote_average - b.vote_average);
-        })
-        break;
-      case 'less':
-        state[state.sorting.type].sort((a, b) => {
-          return (a.vote_average - b.vote_average);
-        })
-      default:
-        break;
-    }
-    renderSearchResult(state)
-  },
-  date: (state) => {
-    switch (state.sorting.date) {
-      case 'new':
-        state[state.sorting.type].sort((b, a) => {
-          if (b.release_date > a.release_date) {
-            return -1
-          }
-          if (b.release_date < a.release_date) {
-            return 1
-          }
-          return 0
-        })
-        break;
-      case 'old':
-        state[state.sorting.type].sort((a, b) => {
-          if (b.release_date > a.release_date) {
-            return -1
-          }
-          if (b.release_date < a.release_date) {
-            return 1
-          }
-          return 0
-        })
-      default:
-        break;
-    }
-    renderSearchResult(state)
-  },
-}
-
-const setActiveFilter = (filterName, filterType) => {
-  const elements = document.querySelectorAll(`[data-name="${filterName}"]`);
-  elements.forEach((element) => {
-    element.classList.remove('filter__link--active');
-    if (element.dataset.type === filterType) {
-      element.classList.add('filter__link--active');
-    }
-  })
-}
-
-const filtersClickHandle = (state) => (e) => {
-  e.preventDefault();
-  const target = e.target.closest('.filter__link');
-  if (target) {
-    const filterName = target.dataset.name;
-    const filterType = target.dataset.type;
-    state.sorting[filterName] = filterType;
-    filtersActions[filterName](state);
-    setActiveFilter(filterName, filterType);
   }
-}
 
-const renderModal = (data) => {
-  const {
-    id,
-    title,
-    poster_path,
-    genres,
-    vote_average,
-    overview,
-    homepage
-  } = data;
-  const modalContent = new Modal(id, title, poster_path, genres, vote_average, overview, homepage);
-  modal.textContent = '';
-  modal.classList.toggle('modal--show')
-  modal.append(modalContent.renderModal());
-  const modalCloseBtn = modal.querySelector('.modal__close');
-  modalCloseBtn.addEventListener('click', (e) => {
+  const filtersClickHandle = (state) => (e) => {
     e.preventDefault();
-    modal.classList.toggle('modal--show')
-  })
-}
+    const target = e.target.closest('.js__filter');
+    if (target) {
+      const filterName = target.dataset.name;
+      const filterType = target.dataset.type;
+      state.sorting[filterName] = filterType;
+      filtersActions[filterName](state);
+      setActiveFilter(filterName, filterType);
+    }
+  }
 
-const app = () => {
+  const renderModal = (data) => {
+    console.log(data);
+    const {
+      id,
+      title,
+      poster_path,
+      genres,
+      vote_average,
+      overview,
+      homepage
+    } = data;
+    const modalContent = new Modal(id, title, poster_path, genres, vote_average, overview, homepage);
+    modal.textContent = '';
+    modal.classList.toggle('modal--show')
+    modal.append(modalContent.renderModal());
+    const modalCloseBtn = modal.querySelector('.modal__close');
+    modalCloseBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      modal.classList.toggle('modal--show')
+    })
+  }
+
   // const getMovieInfo = () => {
   //   const itemType = (state.sorting.type === 'movieList') ? 'movie' : 'tv';
   //   new DBservice().getItemInfo(state.currentMovieId, itemType, state.sorting.type).then(renderModal)
@@ -361,7 +364,7 @@ const app = () => {
 
   const getMovieInfo = async () => {
     const itemType = (state.sorting.type === 'movieList') ? 'movie' : 'tv';
-    const movieInfo = await new DBservice().getItemInfo(state.currentMovieId, itemType, state.sorting.type);
+    const movieInfo = await new DBservice().getItemInfo(state.currentMovieId, itemType, state.sorting.type, state.sorting.lang);
     renderModal(movieInfo);
   };
 
@@ -376,8 +379,8 @@ const app = () => {
   }
 
   const getData = (query) => {
-    const movieList = new DBservice().getMovieList(query).then((data) => state.movieList = data);
-    const tvShowList = new DBservice().getTvShowList(query).then((data) => state.tvShowList = data);
+    const movieList = new DBservice().getMovieList(query, state.sorting.lang).then((data) => state.movieList = data);
+    const tvShowList = new DBservice().getTvShowList(query, state.sorting.lang).then((data) => state.tvShowList = data);
     Promise.all([movieList, tvShowList]).then(() => {
       localStorage.setItem('state', JSON.stringify(state));
       renderSearchResult(state)
@@ -390,6 +393,7 @@ const app = () => {
     const searchValue = formData.get('search').trim();
     form.elements.search.value = '';
     getData(searchValue);
+    state.query = searchValue;
   }
 
   const state = {
@@ -398,19 +402,21 @@ const app = () => {
     tvShowList: [],
     activeTab: 'movieList',
     currentMovieId: null,
+    query: undefined,
     modal: false,
     sorting: {
       popularity: 'up',
       date: 'new',
       type: 'movieList',
+      lang: 'ru-Ru',
     }
   }
 
   form.addEventListener('submit', formHandler);
-  // getData('marvel', state);
+  getData('marvel', state);
   filters.addEventListener('click', filtersClickHandle(state));
   movies.addEventListener('click', itemClickHandler);
-  // getMovieInfo(284053);
+
 }
 
 app();

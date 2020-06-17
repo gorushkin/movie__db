@@ -1,8 +1,9 @@
 .header {
-  min-height: 150px;
+  min-height: 100px;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding-top: 50px;
 }
 
 .header__form {
@@ -17,7 +18,17 @@
   font-size: 35px;
 }
 
-.header__btn {
+.filter__row {
+  display: flex;
+  flex-wrap: nowrap;
+  justify-content: space-between;
+}
+
+.filter__lang-list {
+  display: flex;
+}
+
+.filters__btn {
   border: none;
   display: flex;
   align-items: center;
@@ -26,13 +37,22 @@
   width: 30px;
   height: 30px;
   font-weight: bolder;
+  margin-right: 25px;
+  background: #ffffff;
   cursor: pointer;
-}
 
-.filter__row {
-  display: flex;
-  flex-wrap: nowrap;
-  justify-content: space-between;
+  &.active {
+    outline: 2px solid #000000;
+    color: #ffffff;
+    background: #000000;
+  }
+
+  &:hover,
+  &:focus {
+    color: yellow;
+    background: blue;
+    outline: 2px solid blue;
+  }
 }
 
 .filter--type {
@@ -51,9 +71,8 @@
 }
 
 .filter__link {
-  &--active {
+  &.active {
     color: red;
-    ;
   }
 
   &:hover {
@@ -131,7 +150,7 @@
   z-index: 990;
   background-color: #ffffff;
   transform: scaleY(0);
-  transition: all .2s ease-in-out;
+  transition: all 0.2s ease-in-out;
 
   &--show {
     display: flex;
