@@ -253,31 +253,44 @@ const app = () => {
     return fragment;
   }
 
-  const renderList = (itemList, listName) => {
-    elements[listName].textContent = '';
+  const renderPaginationList = (items, listName) => {
+    // const [firstIndex, lastIndex] = getCurrentPageMovieList(data, state);
+  }
+
+  const getCurrentPageMovieList = (state) => {
+    const firstIndex = state.currentPage * state.itemsOnPageCount - state.itemsOnPageCount;
+    const lastDataIndex = state.items.length - 1;
+    const lastIndex = (state.currentPage * state.itemsOnPageCount > lastDataIndex) ? lastDataIndex : state.currentPage * state.itemsOnPageCount - 1;
+    return [firstIndex, lastIndex];
+  }
+
+  const renderList = (state) => {
+    const [firstIndex, lastIndex] = getCurrentPageMovieList(state);
+    elements[state.listName].textContent = '';
     const fragment = document.createDocumentFragment();
-    itemList.forEach(({
-      id,
-      title,
-      popularity,
-      genres,
-      overview,
-      poster_path,
-      backdrop_path,
-      release_date,
-      vote_average
-    }) => {
+    for (let i = firstIndex; i <= lastIndex; i += 1) {
+      const {
+        id,
+        title,
+        popularity,
+        genres,
+        overview,
+        poster_path,
+        backdrop_path,
+        release_date,
+        vote_average
+      } = state.items[i];
       const movie = new Movie(id, title, popularity, genres, overview, poster_path, backdrop_path, release_date, vote_average);
       fragment.append(movie.renderMovieCard());
-    });
-    elements[listName].append(fragment);
+    }
+    elements[state.listName].append(fragment);
   }
 
 
   const render = (state) => {
-    renderList(state.movieList, 'moviesList');
-    renderList(state.tvShowList, 'tvShowsList');
-
+    renderList(state.movieList);
+    renderList(state.tvShowList);
+    renderPaginationList(state.movieList.items, 'moviesList');
   }
 
   const filtersActions = {
@@ -404,8 +417,8 @@ const app = () => {
   }
 
   const getData = (query) => {
-    const movieList = new DBservice().getMovieList(query, state.sorting.lang).then((data) => state.movieList = data);
-    const tvShowList = new DBservice().getTvShowList(query, state.sorting.lang).then((data) => state.tvShowList = data);
+    const movieList = new DBservice().getMovieList(query, state.sorting.lang).then((data) => state.movieList.items = data);
+    const tvShowList = new DBservice().getTvShowList(query, state.sorting.lang).then((data) => state.tvShowList.items = data);
     Promise.all([movieList, tvShowList]).then(() => {
       localStorage.setItem('state', JSON.stringify(state));
       render(state)
@@ -423,8 +436,18 @@ const app = () => {
 
   const state = {
     language: 'ru-Ru',
-    movieList: [],
-    tvShowList: [],
+    movieList: {
+      listName: 'moviesList',
+      items: [],
+      itemsOnPageCount: 6,
+      currentPage: 1,
+    },
+    tvShowList: {
+      listName: 'tvShowsList',
+      items: [],
+      itemsOnPageCount: 6,
+      currentPage: 1,
+    },
     activeTab: 'movieList',
     currentMovieId: null,
     query: undefined,
