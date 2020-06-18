@@ -232,6 +232,11 @@ const elements = {
   tvShowsList: document.querySelector('.tvshows__list'),
   moviesPaginationList: document.querySelector('.movies__pagination-list'),
   moviesSizeList: document.querySelector('.movies__size-list'),
+  preloader: document.querySelector('.preloader'),
+}
+
+const preloader = () => {
+
 }
 
 const app = () => {
@@ -270,6 +275,11 @@ const app = () => {
   }
 
   const renderPaginationList = (listName) => {
+    if (state[listName].length === 0) {
+      elements.moviesSizeList.style.display = 'none';
+    } else {
+      elements.moviesSizeList.style.display = 'flex';
+    }
     elements.moviesPaginationList.textContent = '';
     const pageCount = Math.ceil(state[listName].length / state.resultSize);
     const fragment = document.createDocumentFragment();
@@ -296,7 +306,7 @@ const app = () => {
     elements.moviesPaginationList.append(fragment);
     setActiveNavigationElement(getBtnsParametrs.number());
     setActiveNavigationElement(getBtnsParametrs.size());
-    elements.moviesSizeList.style.display = 'flex';
+    // elements.moviesSizeList.style.display = 'flex';
   }
 
   const getCurrentPageMovieList = (listName) => {
@@ -309,29 +319,39 @@ const app = () => {
   const renderList = (listName) => {
     const [firstIndex, lastIndex] = getCurrentPageMovieList(listName);
     elements[listName].textContent = '';
-    const fragment = document.createDocumentFragment();
-    for (let i = firstIndex; i <= lastIndex; i += 1) {
-      const {
-        id,
-        title,
-        popularity,
-        genres,
-        overview,
-        poster_path,
-        backdrop_path,
-        release_date,
-        vote_average
-      } = state[listName][i];
-      const movie = new Movie(id, title, popularity, genres, overview, poster_path, backdrop_path, release_date, vote_average);
-      fragment.append(movie.renderMovieCard());
-    };
-    elements[listName].append(fragment);
+    const messageTitle = document.createElement('h2');
+    messageTitle.className = 'movies__title';
+    const message = (state[listName].length === 0) ? 'По вашему запрсу ничего не найдено' : `Было найдено ${state[listName].length} элемента`
+    messageTitle.textContent = message;
+    elements[listName].append(messageTitle);
+    if (state[listName].length !== 0) {
+      const itemList = document.createElement('ul');
+      itemList.className = 'item__list';
+      for (let i = firstIndex; i <= lastIndex; i += 1) {
+        const {
+          id,
+          title,
+          popularity,
+          genres,
+          overview,
+          poster_path,
+          backdrop_path,
+          release_date,
+          vote_average
+        } = state[listName][i];
+        const movie = new Movie(id, title, popularity, genres, overview, poster_path, backdrop_path, release_date, vote_average);
+        itemList.append(movie.renderMovieCard());
+      };
+      elements[listName].append(itemList);
+    }
   }
 
   const render = () => {
+    elements.preloader.style.display = 'none';
     renderList('moviesList');
     renderList('tvShowsList');
     renderPaginationList(state.sorting.type);
+
   }
 
   const filtersActions = {
@@ -456,6 +476,7 @@ const app = () => {
   }
 
   const getData = (query) => {
+    elements.preloader.style.display = 'flex';
     const moviesList = new DBservice().getmoviesList(query, state.sorting.lang).then((data) => state.moviesList = data);
     const tvShowsList = new DBservice().gettvShowsList(query, state.sorting.lang).then((data) => state.tvShowsList = data);
     Promise.all([moviesList, tvShowsList]).then(() => {
@@ -497,6 +518,7 @@ const app = () => {
   movies.addEventListener('click', itemClickHandler);
   elements.moviesPaginationList.addEventListener('click', navigationListClickHandler);
   elements.moviesSizeList.addEventListener('click', navigationListClickHandler);
+  elements.moviesSizeList.style.display = 'none';
 }
 
 app();
