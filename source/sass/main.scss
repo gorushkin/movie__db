@@ -220,12 +220,18 @@
   }
 }
 
-.movies__pagination-list {
+.movies__navigation {
   display: flex;
+  justify-content: space-between;
   padding: 40px 0;
 }
 
-.movies__pagination-link {
+.movies__pagination-list,
+.movies__size-list {
+  display: flex;
+}
+
+.btn-nav {
   border: none;
   display: flex;
   align-items: center;
