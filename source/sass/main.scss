@@ -231,6 +231,10 @@
   display: flex;
 }
 
+.movies__size-list {
+  display: none;
+}
+
 .btn-nav {
   border: none;
   display: flex;
@@ -250,8 +254,7 @@
     background: #000000;
   }
 
-  &:hover,
-  &:focus {
+  &:hover {
     color: yellow;
     background: blue;
     outline: 2px solid blue;
