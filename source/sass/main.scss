@@ -82,13 +82,17 @@
 
 .search__result {
   display: none;
+
+  &--active {
+    display: block;
+  }
+}
+
+.item__list {
+  display: grid;
   grid-template-columns: repeat(auto-fill, 185px);
   grid-gap: 1rem;
   justify-content: space-between;
-
-  &--active {
-    display: grid;
-  }
 }
 
 .movies__item {
@@ -265,7 +269,7 @@
 }
 
 .movies__size-list {
-  display: none;
+  // display: none;
 }
 
 .btn-nav {
