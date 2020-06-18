@@ -251,6 +251,16 @@ const app = () => {
     return pagiationListItem;
   }
 
+  const setActivePaginationElement = () => {
+    const paginationElements = document.querySelectorAll('.movies__pagination-link');
+    paginationElements.forEach((element) => {
+      element.classList.remove('active');
+      if (parseInt(element.dataset.number, 10) === state.currentPage) {
+        element.classList.add('active');
+      }
+    })
+  }
+
   const renderPaginationList = (listName) => {
     elements.moviesPaginationList.textContent = '';
     const pageCount = Math.ceil(state[listName].length / state.itemsOnPgeCount);
@@ -267,6 +277,7 @@ const app = () => {
       }
     }
     elements.moviesPaginationList.append(fragment);
+    setActivePaginationElement();
   }
 
   const getCurrentPageMovieList = (listName) => {
