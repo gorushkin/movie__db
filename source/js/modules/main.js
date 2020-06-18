@@ -11,6 +11,11 @@ const elements = {
   tvShowsList: document.querySelector('.tvshows__list'),
   moviesPaginationList: document.querySelector('.movies__pagination-list'),
   moviesSizeList: document.querySelector('.movies__size-list'),
+  preloader: document.querySelector('.preloader'),
+}
+
+const preloader = () => {
+
 }
 
 const app = () => {
@@ -121,6 +126,7 @@ const app = () => {
   }
 
   const render = () => {
+    elements.preloader.style.display = 'none';
     renderList('moviesList');
     renderList('tvShowsList');
     renderPaginationList(state.sorting.type);
@@ -249,6 +255,7 @@ const app = () => {
   }
 
   const getData = (query) => {
+    elements.preloader.style.display = 'flex';
     const moviesList = new DBservice().getmoviesList(query, state.sorting.lang).then((data) => state.moviesList = data);
     const tvShowsList = new DBservice().gettvShowsList(query, state.sorting.lang).then((data) => state.tvShowsList = data);
     Promise.all([moviesList, tvShowsList]).then(() => {
@@ -290,8 +297,7 @@ const app = () => {
   movies.addEventListener('click', itemClickHandler);
   elements.moviesPaginationList.addEventListener('click', navigationListClickHandler);
   elements.moviesSizeList.addEventListener('click', navigationListClickHandler);
-  // elements.moviesSizeList.style.display = 'none';
-
+  elements.moviesSizeList.style.display = 'none';
 }
 
 app();
