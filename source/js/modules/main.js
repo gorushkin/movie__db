@@ -236,23 +236,30 @@ const elements = {
 }
 
 const app = () => {
-  const navigationListClickHandler = (className, dataName, stateKey) => (e) => {
+  const getBtnsParametrs = {
+    number: () =>  ['.movies__pagination-link', 'number', 'currentPage'],
+    size: () => ['.movies__size-link', 'size', 'resultSize']
+  }
+
+  const navigationListClickHandler = (e) => {
     e.preventDefault();
-    const target = e.target.closest(className);
+    const target = e.target.closest('.btn-nav');
+    const taretType = target.dataset.type;
+    const [className, dataName, stateKey] = getBtnsParametrs[taretType]();
     if (target) {
       state[stateKey] = parseInt(target.dataset[dataName], 10);
-      render();
     }
+    render();
   }
 
   const buildPaginationItem = (index) => {
     const pagiationListItem = document.createElement('li');
-    pagiationListItem.innerHTML = `<a href="" data-number="${index}" class="btn-nav movies__pagination-link">${index}</a>`;
+    pagiationListItem.innerHTML = `<a href="" data-type="number" data-number="${index}" class="btn-nav movies__pagination-link">${index}</a>`;
     pagiationListItem.className = 'movies__pagination-item';
     return pagiationListItem;
   }
 
-  const setActiveNavigationElement = (className, dataName, stateKey) => {
+  const setActiveNavigationElement = ([className, dataName, stateKey]) => {
     const elements = document.querySelectorAll(className);
     elements.forEach((element) => {
       element.classList.remove('active');
@@ -278,8 +285,8 @@ const app = () => {
       }
     }
     elements.moviesPaginationList.append(fragment);
-    setActiveNavigationElement('.movies__pagination-link', 'number', 'currentPage');
-    setActiveNavigationElement('.movies__size-link', 'size', 'resultSize');
+    setActiveNavigationElement(getBtnsParametrs.number());
+    setActiveNavigationElement(getBtnsParametrs.size());
     elements.moviesSizeList.style.display = 'flex';
   }
 
@@ -480,8 +487,8 @@ const app = () => {
   getData('marvel', state);
   filters.addEventListener('click', filtersClickHandle);
   movies.addEventListener('click', itemClickHandler);
-  elements.moviesPaginationList.addEventListener('click', navigationListClickHandler('.movies__pagination-link', 'number', 'currentPage'))
-  elements.moviesSizeList.addEventListener('click', navigationListClickHandler('.movies__size-link', 'size', 'resultSize'))
+  elements.moviesPaginationList.addEventListener('click', navigationListClickHandler)
+  elements.moviesSizeList.addEventListener('click', navigationListClickHandler)
 }
 
 app();
