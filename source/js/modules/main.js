@@ -235,6 +235,15 @@ const elements = {
 }
 
 const app = () => {
+  const paginationListClickHandler = (e) => {
+    e.preventDefault();
+    const target = e.target.closest('.movies__pagination-link');
+    if (target) {
+      state.currentPage = parseInt(target.dataset.number, 10);
+      render();
+    }
+  }
+
   const buildPaginationItem = (index) => {
     const pagiationListItem = document.createElement('li');
     pagiationListItem.innerHTML = `<a href="" data-number="${index}" class="movies__pagination-link">${index}</a>`;
@@ -444,7 +453,7 @@ const app = () => {
     language: 'ru-Ru',
     moviesList: [],
     tvShowsList: [],
-    currentPage: 2,
+    currentPage: 1,
     itemsOnPgeCount: 6,
     activeTab: 'moviesList',
     currentMovieId: null,
@@ -462,6 +471,7 @@ const app = () => {
   getData('marvel', state);
   filters.addEventListener('click', filtersClickHandle);
   movies.addEventListener('click', itemClickHandler);
+  elements.moviesPaginationList.addEventListener('click', paginationListClickHandler)
 
 }
 
