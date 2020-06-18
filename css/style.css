@@ -679,12 +679,51 @@ body {
   border: 3px solid rgba(124, 124, 124, 0.5);
 }
 
-.movies__pagination-list {
+.movies__navigation {
   display: flex;
+  justify-content: space-between;
   padding: 40px 0;
 }
 
-.movies__pagination-link {
+.movies__pagination-list,
+.movies__size-list {
+  display: flex;
+}
+
+.movies__pagination-item,
+.movies__size-item {
+  margin-right: 25px;
+  display: flex;
+}
+
+.movies__pagination-item.last::after, .movies__pagination-item.first::before,
+.movies__size-item.last::after,
+.movies__size-item.first::before {
+  content: "";
+  width: 25px;
+  height: 30px;
+  display: flex;
+  background: url("../img/three-dots-svgrepo-com.svg") no-repeat center top 13px/contain;
+  align-items: center;
+}
+
+.movies__pagination-item.last::after,
+.movies__size-item.last::after {
+  margin-left: 10px;
+  margin-right: -15px;
+}
+
+.movies__pagination-item.first::before,
+.movies__size-item.first::before {
+  margin-right: 10px;
+  margin-left: -15px;
+}
+
+.movies__size-list {
+  display: none;
+}
+
+.btn-nav {
   border: none;
   display: flex;
   align-items: center;
@@ -693,18 +732,17 @@ body {
   width: 30px;
   height: 30px;
   font-weight: bolder;
-  margin-right: 25px;
   background: #ffffff;
   cursor: pointer;
 }
 
-.movies__pagination-link.active {
+.btn-nav.active {
   outline: 2px solid #000000;
   color: #ffffff;
   background: #000000;
 }
 
-.movies__pagination-link:hover, .movies__pagination-link:focus {
+.btn-nav:hover {
   color: yellow;
   background: blue;
   outline: 2px solid blue;

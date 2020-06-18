@@ -219,7 +219,6 @@ const Modal = class {
     console.log(this.title, this.id);
   }
 }
-
 const form = document.querySelector('.header__form');
 const movies = document.querySelector('.movies');
 const modal = document.querySelector('.modal');
@@ -232,24 +231,61 @@ const elements = {
   moviesList: document.querySelector('.movies__list'),
   tvShowsList: document.querySelector('.tvshows__list'),
   moviesPaginationList: document.querySelector('.movies__pagination-list'),
+  moviesSizeList: document.querySelector('.movies__size-list'),
 }
 
 const app = () => {
-  const buildPaginationItem = (index) => {
+  const getBtnsParametrs = {
+    number: () => ['.movies__pagination-link', 'number', 'currentPage'],
+    size: () => ['.movies__size-link', 'size', 'resultSize']
+  }
+
+  const navigationListClickHandler = (e) => {
+    e.preventDefault();
+    const target = e.target.closest('.btn-nav');
+    const taretType = target.dataset.type;
+    const [className, dataName, stateKey] = getBtnsParametrs[taretType]();
+    if (target) {
+      state[stateKey] = parseInt(target.dataset[dataName], 10);
+    }
+    render();
+  }
+
+  const buildPaginationItem = (index, isExtreme = undefined) => {
+    const extremeTag = (isExtreme) ? isExtreme : '';
     const pagiationListItem = document.createElement('li');
-    pagiationListItem.innerHTML = `<a href="" data-number="${index}" class="movies__pagination-link">${index}</a>`;
-    pagiationListItem.className = 'movies__pagination-item';
+    pagiationListItem.innerHTML = `<a href="" data-type="number" data-number="${index}" class=" btn-nav movies__pagination-link">${index}</a>`;
+    pagiationListItem.className = `${extremeTag} movies__pagination-item`;
     return pagiationListItem;
+  }
+
+  const setActiveNavigationElement = ([className, dataName, stateKey]) => {
+    const elements = document.querySelectorAll(className);
+    elements.forEach((element) => {
+      element.classList.remove('active');
+      if (parseInt(element.dataset[dataName], 10) === state[stateKey]) {
+        element.classList.add('active');
+      }
+    })
   }
 
   const renderPaginationList = (listName) => {
     elements.moviesPaginationList.textContent = '';
-    const pageCount = Math.ceil(state[listName].length / state.itemsOnPgeCount);
+    const pageCount = Math.ceil(state[listName].length / state.resultSize);
     const fragment = document.createDocumentFragment();
     if (pageCount >= 6) {
       fragment.append(buildPaginationItem(1));
-      for (i = Math.min(pageCount - 3, (Math.max(2, state.currentPage - 1))); i <= Math.max(4, (Math.min(state.currentPage + 1, pageCount - 1))); i += 1) {
-        fragment.append(buildPaginationItem(i));
+      const minIndex = Math.min(pageCount - 3, (Math.max(2, state.currentPage - 1)));
+      const maxIndex = Math.max(4, (Math.min(state.currentPage + 1, pageCount - 1)))
+      for (i = minIndex; i <= maxIndex; i += 1) {
+        console.log(state.currentPage);
+        if (state.currentPage >= 4 && i === minIndex) {
+          fragment.append(buildPaginationItem(i, 'first'));
+        } else if (state.currentPage <= pageCount - 3 && i === maxIndex) {
+          fragment.append(buildPaginationItem(i, 'last'));
+        } else {
+          fragment.append(buildPaginationItem(i));
+        }
       };
       fragment.append(buildPaginationItem(pageCount));
     } else {
@@ -258,12 +294,15 @@ const app = () => {
       }
     }
     elements.moviesPaginationList.append(fragment);
+    setActiveNavigationElement(getBtnsParametrs.number());
+    setActiveNavigationElement(getBtnsParametrs.size());
+    elements.moviesSizeList.style.display = 'flex';
   }
 
   const getCurrentPageMovieList = (listName) => {
-    const firstIndex = state.currentPage * state.itemsOnPgeCount - state.itemsOnPgeCount;
+    const firstIndex = state.currentPage * state.resultSize - state.resultSize;
     const lastDataIndex = state[listName].length - 1;
-    const lastIndex = (state.currentPage * state.itemsOnPgeCount > lastDataIndex) ? lastDataIndex : state.currentPage * state.itemsOnPgeCount - 1;
+    const lastIndex = (state.currentPage * state.resultSize > lastDataIndex) ? lastDataIndex : state.currentPage * state.resultSize - 1;
     return [firstIndex, lastIndex];
   }
 
@@ -288,7 +327,6 @@ const app = () => {
     };
     elements[listName].append(fragment);
   }
-
 
   const render = () => {
     renderList('moviesList');
@@ -401,11 +439,6 @@ const app = () => {
     })
   }
 
-  // const getMovieInfo = () => {
-  //   const itemType = (state.sorting.type === 'moviesList') ? 'movie' : 'tv';
-  //   new DBservice().getItemInfo(state.currentMovieId, itemType, state.sorting.type).then(renderModal)
-  // };
-
   const getMovieInfo = async () => {
     const itemType = (state.sorting.type === 'moviesList') ? 'movie' : 'tv';
     const movieInfo = await new DBservice().getItemInfo(state.currentMovieId, itemType, state.sorting.type, state.sorting.lang);
@@ -444,8 +477,8 @@ const app = () => {
     language: 'ru-Ru',
     moviesList: [],
     tvShowsList: [],
-    currentPage: 2,
-    itemsOnPgeCount: 6,
+    currentPage: 1,
+    resultSize: 6,
     activeTab: 'moviesList',
     currentMovieId: null,
     query: undefined,
@@ -462,7 +495,8 @@ const app = () => {
   getData('marvel', state);
   filters.addEventListener('click', filtersClickHandle);
   movies.addEventListener('click', itemClickHandler);
-
+  elements.moviesPaginationList.addEventListener('click', navigationListClickHandler);
+  elements.moviesSizeList.addEventListener('click', navigationListClickHandler);
 }
 
 app();
