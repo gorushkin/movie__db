@@ -14,8 +14,12 @@ const elements = {
   preloader: document.querySelector('.preloader'),
 }
 
-const preloader = () => {
+const showPreloader = () => {
+  elements.preloader.style.display = 'flex';
+}
 
+const hidePreloader = () => {
+  elements.preloader.style.display = 'none';
 }
 
 const app = () => {
@@ -85,7 +89,6 @@ const app = () => {
     elements.moviesPaginationList.append(fragment);
     setActiveNavigationElement(getBtnsParametrs.number());
     setActiveNavigationElement(getBtnsParametrs.size());
-    // elements.moviesSizeList.style.display = 'flex';
   }
 
   const getCurrentPageMovieList = (listName) => {
@@ -126,7 +129,7 @@ const app = () => {
   }
 
   const render = () => {
-    elements.preloader.style.display = 'none';
+    hidePreloader();
     renderList('moviesList');
     renderList('tvShowsList');
     renderPaginationList(state.sorting.type);
@@ -217,7 +220,6 @@ const app = () => {
   }
 
   const renderModal = (data) => {
-    console.log(data);
     const {
       id,
       title,
@@ -231,6 +233,7 @@ const app = () => {
     modal.textContent = '';
     modal.classList.toggle('modal--show')
     modal.append(modalContent.renderModal());
+    hidePreloader();
     const modalCloseBtn = modal.querySelector('.modal__close');
     modalCloseBtn.addEventListener('click', (e) => {
       e.preventDefault();
@@ -251,11 +254,12 @@ const app = () => {
       const itemId = target.dataset.id;
       state.currentMovieId = itemId;
       getMovieInfo();
+      showPreloader();
     }
   }
 
   const getData = (query) => {
-    elements.preloader.style.display = 'flex';
+    showPreloader();
     const moviesList = new DBservice().getmoviesList(query, state.sorting.lang).then((data) => state.moviesList = data);
     const tvShowsList = new DBservice().gettvShowsList(query, state.sorting.lang).then((data) => state.tvShowsList = data);
     Promise.all([moviesList, tvShowsList]).then(() => {
