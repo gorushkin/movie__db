@@ -1,6 +1,5 @@
-body {
-  background: $main-color;
-  color: #ffffff;
+.wrapper {
+  position: relative;
 }
 
 .header {
@@ -9,6 +8,7 @@ body {
   justify-content: center;
   align-items: center;
   padding-top: 50px;
+  outline: 2px solid red;
 }
 
 .header__form {
@@ -30,9 +30,14 @@ body {
 }
 
 .filter__row {
-  display: flex;
+  // display: flex;
+  display: none;
   flex-wrap: nowrap;
   justify-content: space-between;
+
+  &.show {
+    display: flex;
+  }
 }
 
 .filter__lang-list {
@@ -104,136 +109,4 @@ body {
   grid-template-columns: repeat(auto-fill, 185px);
   grid-gap: 1rem;
   justify-content: space-between;
-}
-
-.movies__item {
-  min-width: 185px;
-  display: block;
-  min-height: 370px;
-  margin-bottom: 25px;
-}
-
-.card {
-  display: flex;
-  min-height: 370px;
-  flex-direction: column;
-  box-shadow: 3px 25px 20px 1px rgba(48, 41, 41, 0.75);
-  position: relative;
-  transition: all 0.3s;
-  background: #ffffff;
-  color: #000000;
-
-  &:hover,
-  &:focus {
-    transform: translateY(10px);
-    box-shadow: 0 15px 10px 3px rgba(48, 41, 41, 0.75);
-  }
-}
-
-.card__vote {
-  position: absolute;
-  top: 18px;
-  left: 1px;
-  text-align: center;
-  color: #FFFFFF;
-  background-color: #FF637D;
-  height: 25px;
-  width: 44px;
-  display: inline-block;
-  line-height: 25px;
-  font-weight: 900;
-}
-
-.card__img {
-  height: 278px;
-  width: 185px;
-}
-
-.card__title {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  padding: 15px 15px 0;
-  max-height: 80px;
-}
-
-
-
-.movies__navigation {
-  display: flex;
-  justify-content: space-between;
-  padding: 40px 0;
-}
-
-.movies__pagination-list,
-.movies__size-list {
-  display: flex;
-}
-
-.movies__pagination-item,
-.movies__size-item {
-  margin-right: 25px;
-  display: flex;
-  $pseudo-width: 10px;
-  $margin: -15px;
-
-  &.last::after,
-  &.first::before {
-    content: "";
-    width: 25px;
-    height: 30px;
-    display: flex;
-    background: url("../img/three-dots-svgrepo-com.svg") no-repeat center top 13px / contain;
-    align-items: center;
-  }
-
-
-  &.last {
-    &::after {
-      margin-left: $pseudo-width;
-      margin-right: $margin;
-    }
-  }
-
-  &.first {
-    &::before {
-      margin-right: $pseudo-width;
-      margin-left: $margin;
-    }
-  }
-}
-
-.movies__size-list {
-  // display: none;
-}
-
-.filters__btn,
-.btn-nav {
-  border: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  // outline: 2px solid #948e8e;
-  outline: 2px solid #000000;
-  width: 30px;
-  height: 30px;
-  color: $main-color;
-  font-weight: bolder;
-  background: #ffffff;
-  cursor: pointer;
-
-  &.active {
-    outline: 2px solid #000000;
-    color: #ffffff;
-    background: #000000;
-  }
-
-  &:hover {
-    color: yellow;
-    background: blue;
-    outline: 2px solid blue;
-  }
-}
-
-.wrapper {
-  position: relative;
 }

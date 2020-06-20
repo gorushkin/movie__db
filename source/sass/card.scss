@@ -1,0 +1,42 @@
+.card {
+  display: flex;
+  min-height: 370px;
+  flex-direction: column;
+  box-shadow: 3px 25px 20px 1px rgba(48, 41, 41, 0.75);
+  position: relative;
+  transition: all 0.3s;
+  background: #ffffff;
+  color: #000000;
+
+  &:hover,
+  &:focus {
+    transform: translateY(10px);
+    box-shadow: 0 15px 10px 3px rgba(48, 41, 41, 0.75);
+  }
+}
+
+.card__vote {
+  position: absolute;
+  top: 18px;
+  left: 1px;
+  text-align: center;
+  color: #FFFFFF;
+  background-color: #FF637D;
+  height: 25px;
+  width: 44px;
+  display: inline-block;
+  line-height: 25px;
+  font-weight: 900;
+}
+
+.card__img {
+  height: 278px;
+  width: 185px;
+}
+
+.card__title {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 15px 15px 0;
+  max-height: 80px;
+}

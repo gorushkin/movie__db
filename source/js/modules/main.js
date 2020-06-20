@@ -42,7 +42,7 @@ const app = () => {
   const buildPaginationItem = (index, isExtreme = undefined) => {
     const extremeTag = (isExtreme) ? isExtreme : '';
     const pagiationListItem = document.createElement('li');
-    pagiationListItem.innerHTML = `<a href="" data-type="number" data-number="${index}" class=" btn-nav movies__pagination-link">${index}</a>`;
+    pagiationListItem.innerHTML = `<a href="" data-type="number" data-number="${index}" class="btn btn-nav movies__pagination-link">${index}</a>`;
     pagiationListItem.className = `${extremeTag} movies__pagination-item`;
     return pagiationListItem;
   }
@@ -296,7 +296,7 @@ const app = () => {
   }
 
   form.addEventListener('submit', formHandler);
-  getData('marvel', state);
+  // getData('marvel', state);
   filters.addEventListener('click', filtersClickHandle);
   movies.addEventListener('click', itemClickHandler);
   elements.moviesPaginationList.addEventListener('click', navigationListClickHandler);
@@ -304,4 +304,10 @@ const app = () => {
   elements.moviesSizeList.style.display = 'none';
 }
 
-app();
+
+
+const init = () => {
+  app();
+}
+
+init();

@@ -14,21 +14,20 @@
       <form action="" class="header__form">
         <input type="text" class="header__input" name="search" placeholder="Введите название!">
       </form>
-
+      <ul class="filter__lang-list">
+        <li class="lang-item">
+          <a data-name="lang" data-type="ru-RU" class="js__filter filters__btn btn">Ru</a>
+        </li>
+        <li class="lang-item">
+          <a data-name="lang" data-type="en-US" class="js__filter filters__btn btn">En</a>
+        </li>
+      </ul>
     </div>
   </header>
 
   <main class="main">
     <section class="filters">
       <div class="wrapper">
-        <ul class="filter__lang-list">
-          <li class="lang-item">
-            <a data-name="lang" data-type="ru-RU" class="js__filter filters__btn">Ru</a>
-          </li>
-          <li class="lang-item">
-            <a data-name="lang" data-type="en-US" class="js__filter filters__btn">En</a>
-          </li>
-        </ul>
 
         <div class="filter__row">
           <div class="filter filter--popularity">
@@ -54,8 +53,7 @@
             </ul>
           </div>
         </div>
-        <div class="filter filter--type">
-          <!-- <h2 class="filter__title">По дате выпуска</h2> -->
+        <div class="filter__row filter filter--type">
           <ul class="filter__type-list">
             <li class="filter__type-item">
               <a data-name="type" data-type="moviesList" class="js__filter filter__link" href="">Movies</a>
@@ -82,11 +80,11 @@
           </ul>
           <ul class="movies__size-list">
             <li class="movies__size-item"><a href="#" data-type="size" data-size="6"
-                class="movies__size-link btn-nav">6</a></li>
+                class="movies__size-link btn-nav btn">6</a></li>
             <li class="movies__size-item"><a href="#" data-type="size" data-size="12"
-                class="movies__size-link btn-nav">12</a></li>
+                class="movies__size-link btn-nav btn">12</a></li>
             <li class="movies__size-item"><a href="#" data-type="size" data-size="24"
-                class="movies__size-link btn-nav">24</a></li>
+                class="movies__size-link btn-nav btn">24</a></li>
           </ul>
         </div>
       </div>
