@@ -1,0 +1,53 @@
+.movies {
+  display: none;
+}
+
+.movies__navigation {
+  display: flex;
+  justify-content: space-between;
+  padding: 40px 0;
+}
+
+.movies__pagination-list,
+.movies__size-list {
+  display: flex;
+}
+
+.movies__item {
+  min-width: 185px;
+  display: block;
+  min-height: 370px;
+  margin-bottom: 25px;
+}
+
+.movies__pagination-item,
+.movies__size-item {
+  margin-right: 25px;
+  display: flex;
+  $pseudo-width: 10px;
+  $margin: -15px;
+
+  &.last::after,
+  &.first::before {
+    content: "";
+    width: 25px;
+    height: 30px;
+    display: flex;
+    background: url("../img/three-dots-svgrepo-com.svg") no-repeat center top 13px / contain;
+    align-items: center;
+  }
+
+  &.last {
+    &::after {
+      margin-left: $pseudo-width;
+      margin-right: $margin;
+    }
+  }
+
+  &.first {
+    &::before {
+      margin-right: $pseudo-width;
+      margin-left: $margin;
+    }
+  }
+}
