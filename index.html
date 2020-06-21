@@ -9,8 +9,8 @@
 </head>
 
 <body>
-  <header class="header">
-    <div class="wrapper">
+  <header class="header header--fullheight">
+    <div class="wrapper header__content">
       <form action="" class="header__form">
         <input type="text" class="header__input" name="search" placeholder="Введите название!">
       </form>
@@ -26,6 +26,12 @@
   </header>
 
   <main class="main">
+    <div class="preloader">
+      <span class="ouro ouro3">
+        <span class="left"><span class="anim"></span></span>
+        <span class="right"><span class="anim"></span></span>
+      </span>
+    </div>
     <section class="filters">
       <div class="wrapper">
 
@@ -67,6 +73,7 @@
     </section>
     <!-- TODO: Заемнить теги 'movies' на 'search'-->
     <section class="movies">
+
       <div class="wrapper">
 
         <div class="movies__result">
@@ -128,12 +135,12 @@
       </div>
       
     </div>
-    <div class="preloader">
+    <!-- <div class="preloader">
       <span class="ouro ouro3">
         <span class="left"><span class="anim"></span></span>
         <span class="right"><span class="anim"></span></span>
       </span>
-    </div>
+    </div> -->
   </main>
   <script src="js/main.js"></script>
   <!-- <script src="js/vendor.js"></script> -->
