@@ -7,6 +7,8 @@ const filters = document.querySelector('.filters');
 const resultTabs = document.querySelectorAll('.search__result');
 
 const elements = {
+  header: document.querySelector('.header'),
+  headerContent: document.querySelector('.header__content'),
   moviesList: document.querySelector('.movies__list'),
   tvShowsList: document.querySelector('.tvshows__list'),
   moviesPaginationList: document.querySelector('.movies__pagination-list'),
@@ -268,16 +270,34 @@ const app = () => {
     });
   }
 
+  const start = () => {
+    if (state.start) {
+      console.log(elements.header);
+      elements.header.classList.remove('header--fullheight');
+      elements.headerContent.style.transform = '';
+    }
+  }
+
   const formHandler = (e) => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const searchValue = formData.get('search').trim();
     form.elements.search.value = '';
     getData(searchValue);
+    state.start = true;
+    start();
     state.query = searchValue;
   }
 
+  const moveHeader = () => {
+    const windowHeight = window.innerHeight;
+    const headerContentHeight = elements.headerContent.offsetHeight;
+    const headerPosition = windowHeight / 2 - headerContentHeight / 2;
+    elements.headerContent.style.transform = `translateY(${headerPosition}px)`;
+  }
+
   const state = {
+    start: false,
     language: 'ru-Ru',
     moviesList: [],
     tvShowsList: [],
@@ -295,19 +315,20 @@ const app = () => {
     }
   }
 
-  form.addEventListener('submit', formHandler);
   // getData('marvel', state);
+  moveHeader();
   filters.addEventListener('click', filtersClickHandle);
   movies.addEventListener('click', itemClickHandler);
   elements.moviesPaginationList.addEventListener('click', navigationListClickHandler);
   elements.moviesSizeList.addEventListener('click', navigationListClickHandler);
   elements.moviesSizeList.style.display = 'none';
+  form.addEventListener('submit', formHandler);
 }
 
 
+app();
 
-const init = () => {
-  app();
-}
+// const init = () => {
+// }
 
-init();
+// init();

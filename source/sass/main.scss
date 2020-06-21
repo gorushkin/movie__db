@@ -1,15 +1,28 @@
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
 .wrapper {
   position: relative;
 }
 
 .header {
-  min-height: 100px;
-  display: flex;
   justify-content: center;
-  align-items: center;
-  padding-top: 50px;
-  outline: 2px solid red;
+  transition: all 0.3s;
+  position: relative;
+
+  &--fullheight {
+    height: 100vh;
+  }
 }
+
+.header__content {
+  transition: all 0.3s;
+  padding-top: 50px;
+}
+
 
 .header__form {
   width: 100%;
@@ -30,7 +43,7 @@
 }
 
 .filter__row {
-  // display: flex;
+  display: flex;
   display: none;
   flex-wrap: nowrap;
   justify-content: space-between;
@@ -109,4 +122,9 @@
   grid-template-columns: repeat(auto-fill, 185px);
   grid-gap: 1rem;
   justify-content: space-between;
+}
+
+.main {
+  position: relative;
+  flex-grow: 1;
 }
