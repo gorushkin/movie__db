@@ -260,14 +260,19 @@ const app = () => {
     }
   }
 
-  const getData = (query) => {
+  const getData = async (query) => {
     showPreloader();
-    const moviesList = new DBservice().getmoviesList(query, state.sorting.lang).then((data) => state.moviesList = data);
-    const tvShowsList = new DBservice().gettvShowsList(query, state.sorting.lang).then((data) => state.tvShowsList = data);
-    Promise.all([moviesList, tvShowsList]).then(() => {
-      localStorage.setItem('state', JSON.stringify(state));
-      render(state)
-    });
+    const moviesList = await new DBservice().getmoviesList(query, state.sorting.lang);
+    const tvShowsList = await new DBservice().gettvShowsList(query, state.sorting.lang);
+    state.moviesList = moviesList;
+    state.tvShowsList = tvShowsList;
+    render(state);
+    // const moviesList = new DBservice().getmoviesList(query, state.sorting.lang).then((data) => state.moviesList = data);
+    // const tvShowsList = new DBservice().gettvShowsList(query, state.sorting.lang).then((data) => state.tvShowsList = data);
+    // Promise.all([moviesList, tvShowsList]).then(() => {
+    //   localStorage.setItem('state', JSON.stringify(state));
+    //   render(state)
+    // });
   }
 
   const start = () => {
