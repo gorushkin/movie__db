@@ -37,6 +37,9 @@ const app = () => {
     const [className, dataName, stateKey] = getBtnsParametrs[taretType]();
     if (target) {
       state[stateKey] = parseInt(target.dataset[dataName], 10);
+      if (taretType === 'size') {
+        state.currentPage = 1;
+      }
     }
     render();
   }
@@ -320,7 +323,7 @@ const app = () => {
     }
   }
 
-  // getData('marvel', state);
+  getData('marvel', state);
   moveHeader();
   filters.addEventListener('click', filtersClickHandle);
   movies.addEventListener('click', itemClickHandler);
