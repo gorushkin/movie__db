@@ -1,10 +1,8 @@
 const form = document.querySelector('.header__form');
 const movies = document.querySelector('.movies');
-const modal = document.querySelector('.modal');
 const moviesList = document.querySelector('.movies__list');
 const tvShowsList = document.querySelector('.tvshows__list');
 const filters = document.querySelectorAll('.js__filter');
-console.log('filters: ', filters);
 const resultTabs = document.querySelectorAll('.search__result');
 
 const elements = {
@@ -15,6 +13,17 @@ const elements = {
   moviesPaginationList: document.querySelector('.movies__pagination-list'),
   moviesSizeList: document.querySelector('.movies__size-list'),
   preloader: document.querySelector('.preloader'),
+}
+
+const modal = {
+  main: document.querySelector('.modal'),
+  modalTitle: document.querySelector('.modal__title'),
+  modalPoster: document.querySelector('.modal__poster'),
+  modalGenresList: document.querySelector('.modal__genres-list'),
+  modalRating: document.querySelector('.modal__rating'),
+  modalOverview: document.querySelector('.modal__overview'),
+  modalLink: document.querySelector('.modal__link'),
+  modalCloseBtn: document.querySelector('.modal__close'),
 }
 
 const showPreloader = () => {
@@ -233,15 +242,18 @@ const app = () => {
       overview,
       homepage
     } = data;
-    const modalContent = new Modal(id, title, poster_path, genres, vote_average, overview, homepage);
-    modal.textContent = '';
-    modal.classList.toggle('modal--show')
-    modal.append(modalContent.renderModal());
+    const modalInfo = new Modal(id, title, poster_path, genres, vote_average, overview, homepage);
+    modal.modalTitle.textContent = modalInfo.get('title');
+    modal.modalPoster.src = modalInfo.getImgPath(poster_path);
+    modal.modalGenresList.innerHTML = modalInfo.getGenresList();
+    modal.modalRating.textContent = modalInfo.get('vote_average');
+    modal.modalOverview.textContent = modalInfo.get('overview');
+    modal.modalLink.textContent = modalInfo.get('homepage');
+    modal.main.classList.toggle('modal--show');
     hidePreloader();
-    const modalCloseBtn = modal.querySelector('.modal__close');
-    modalCloseBtn.addEventListener('click', (e) => {
+    modal.modalCloseBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      modal.classList.toggle('modal--show')
+      modal.main.classList.remove('modal--show')
     })
   }
 
@@ -316,7 +328,7 @@ const app = () => {
     }
   }
 
-  // getData('marvel', state);
+  getData('marvel', state);
   moveHeader();
   filters.forEach(((filter) => {
     filter.addEventListener('click', filtersClickHandle);
