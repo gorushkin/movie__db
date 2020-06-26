@@ -3,7 +3,8 @@ const movies = document.querySelector('.movies');
 const modal = document.querySelector('.modal');
 const moviesList = document.querySelector('.movies__list');
 const tvShowsList = document.querySelector('.tvshows__list');
-const filters = document.querySelector('.filters');
+const filters = document.querySelectorAll('.js__filter');
+console.log('filters: ', filters);
 const resultTabs = document.querySelectorAll('.search__result');
 
 const elements = {
@@ -214,14 +215,12 @@ const app = () => {
 
   const filtersClickHandle = (e) => {
     e.preventDefault();
-    const target = e.target.closest('.js__filter');
-    if (target) {
-      const filterName = target.dataset.name;
-      const filterType = target.dataset.type;
-      state.sorting[filterName] = filterType;
-      filtersActions[filterName]();
-      setActiveFilter(filterName, filterType);
-    }
+    const target = e.target;
+    const filterName = target.dataset.name;
+    const filterType = target.dataset.type;
+    state.sorting[filterName] = filterType;
+    filtersActions[filterName]();
+    setActiveFilter(filterName, filterType);
   }
 
   const renderModal = (data) => {
@@ -270,12 +269,6 @@ const app = () => {
     state.moviesList = moviesList;
     state.tvShowsList = tvShowsList;
     render(state);
-    // const moviesList = new DBservice().getmoviesList(query, state.sorting.lang).then((data) => state.moviesList = data);
-    // const tvShowsList = new DBservice().gettvShowsList(query, state.sorting.lang).then((data) => state.tvShowsList = data);
-    // Promise.all([moviesList, tvShowsList]).then(() => {
-    //   localStorage.setItem('state', JSON.stringify(state));
-    //   render(state)
-    // });
   }
 
   const start = () => {
@@ -323,9 +316,11 @@ const app = () => {
     }
   }
 
-  getData('marvel', state);
+  // getData('marvel', state);
   moveHeader();
-  filters.addEventListener('click', filtersClickHandle);
+  filters.forEach(((filter) => {
+    filter.addEventListener('click', filtersClickHandle);
+  }))
   movies.addEventListener('click', itemClickHandler);
   elements.moviesPaginationList.addEventListener('click', navigationListClickHandler);
   elements.moviesSizeList.addEventListener('click', navigationListClickHandler);
@@ -333,10 +328,4 @@ const app = () => {
   form.addEventListener('submit', formHandler);
 }
 
-
 app();
-
-// const init = () => {
-// }
-
-// init();

@@ -168,9 +168,11 @@ const Modal = class {
     return posterImg;
   }
 
-  getGenresList = () => this.genres.reduce((acc, {
-    name
-  }) => `${acc}<li>${name}</li>`, '');
+  getGenresList = () => this.genres.reduce((acc, { name }, index, arr) => {
+    const separator = (index !== arr.length - 1) ? ', ' : '';
+    console.log('separator: ', separator);
+    return `${acc}${name}${separator}`
+  }, '');
 
   getHomePage = () => {
     const homePage = (this.homepage) ? `<a class="modal__link" href="${this.homepage}" target="_blanc">Официальная страница</a>` : '';
@@ -178,6 +180,11 @@ const Modal = class {
   }
 
   renderModal = () => {
+    const modal = document.querySelector('.modal');
+    console.log('modal: ', modal);
+  }
+
+  renderModal2 = () => {
     const modalContent = document.createElement('div');
     modalContent.className = 'modal__content';
     modalContent.innerHTML = `
@@ -190,9 +197,9 @@ const Modal = class {
         </h2>
         <div class="modal__genres">
           <h3>Жанр:</h3>
-          <ul class="modal__genres-list">
+          <p class="modal__genres-list">
             ${this.getGenresList()}
-          </ul>
+          </p>
         </div>
         <div>
           <h3>Рейтинг</h3>
