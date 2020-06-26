@@ -111,129 +111,11 @@ const DBservice = class {
   }
 }
 
-const Movie = class {
-  constructor(id, title, popularity, genres, overview, poster_path, backdrop_path, release_date, vote_average) {
-    this.id = id;
-    this.title = title;
-    this.popularity = popularity;
-    this.genres = genres;
-    this.overview = overview;
-    this.poster_path = poster_path;
-    this.backdrop_path = backdrop_path;
-    this.release_date = release_date;
-    this.vote_average = vote_average;
-  }
-
-  getNoPosterImgPath = () => 'img/No_image_available.svg';
-  getApiKey = () => '20ba111713def543aaca200d5d47a284';
-  getUrl = () => 'https://image.tmdb.org/t/p/w185_and_h278_bestv2';
-  getImgPath = (poster_path) => {
-    const posterImg = (poster_path) ? this.getUrl() + poster_path : this.getNoPosterImgPath();
-    return posterImg;
-  }
-
-  renderMovieCard = () => {
-    const card = document.createElement('li');
-    card.classList.add('movies__item');
-    card.dataset.id = this.id;
-    const voteElem = (this.vote_average) ? `<span class="card__vote">${this.vote_average}</span>` : ''
-    card.innerHTML = `
-    <a href="#" class="movies__card card">
-          ${voteElem}
-          <img src="${this.getImgPath(this.poster_path)}" alt="${this.title}" class="card__img">
-          <h3 class="card__title">${this.title}</h3>
-        </a>
-    `;
-    return card;
-  }
-}
-
-const Modal = class {
-  constructor(id, title, poster_path, genres, vote_average, overview, homepage) {
-    this.id = id;
-    this.title = title;
-    this.poster_path = poster_path;
-    this.genres = genres;
-    this.vote_average = vote_average;
-    this.overview = overview;
-    this.homepage = homepage;
-  }
-
-  getNoPosterImgPath = () => 'img/No_image_available.svg';
-  getApiKey = () => '20ba111713def543aaca200d5d47a284';
-  getUrl = () => 'https://image.tmdb.org/t/p/w300_and_h450_bestv2/';
-
-  getImgPath = (poster_path) => {
-    const posterImg = (poster_path) ? this.getUrl() + poster_path : this.getNoPosterImgPath();
-    return posterImg;
-  }
-
-  getGenresList = () => this.genres.reduce((acc, { name }, index, arr) => {
-    const separator = (index !== arr.length - 1) ? ', ' : '';
-    console.log('separator: ', separator);
-    return `${acc}${name}${separator}`
-  }, '');
-
-  getHomePage = () => {
-    const homePage = (this.homepage) ? `<a class="modal__link" href="${this.homepage}" target="_blanc">Официальная страница</a>` : '';
-    return homePage
-  }
-
-  renderModal = () => {
-    const modal = document.querySelector('.modal');
-    console.log('modal: ', modal);
-  }
-
-  renderModal2 = () => {
-    const modalContent = document.createElement('div');
-    modalContent.className = 'modal__content';
-    modalContent.innerHTML = `
-      <div class="modal__poster-wrapper">
-        <img src="${this.getImgPath(this.poster_path)}" alt="" class="modal__poster">
-      </div>
-      <div class="modal__info">
-        <h2 class="modal__title">
-          ${this.title}
-        </h2>
-        <div class="modal__genres">
-          <h3>Жанр:</h3>
-          <p class="modal__genres-list">
-            ${this.getGenresList()}
-          </p>
-        </div>
-        <div>
-          <h3>Рейтинг</h3>
-          <span class="modal__rating">${this.vote_average}</span>
-        </div>
-        <div class="header__info">
-          <h3 dir="auto">Обзор: </h3>
-          <div class="overview" dir="auto">
-            <p class="description">
-            ${this.overview}
-            </p>
-          </div>
-          <p class="modal__link-wrapper">
-            ${this.getHomePage()}
-          </p>
-          <div class="modal__close"></div>
-        </div>
-      </div>
-      `
-    return modalContent;
-  }
-
-  showInfo = () => {
-    console.log(this.title, this.id);
-  }
-}
-
 const form = document.querySelector('.header__form');
 const movies = document.querySelector('.movies');
-const modal = document.querySelector('.modal');
 const moviesList = document.querySelector('.movies__list');
 const tvShowsList = document.querySelector('.tvshows__list');
 const filters = document.querySelectorAll('.js__filter');
-console.log('filters: ', filters);
 const resultTabs = document.querySelectorAll('.search__result');
 
 const elements = {
@@ -244,6 +126,17 @@ const elements = {
   moviesPaginationList: document.querySelector('.movies__pagination-list'),
   moviesSizeList: document.querySelector('.movies__size-list'),
   preloader: document.querySelector('.preloader'),
+}
+
+const modal = {
+  main: document.querySelector('.modal'),
+  modalTitle: document.querySelector('.modal__title'),
+  modalPoster: document.querySelector('.modal__poster'),
+  modalGenresList: document.querySelector('.modal__genres-list'),
+  modalRating: document.querySelector('.modal__rating'),
+  modalOverview: document.querySelector('.modal__overview'),
+  modalLink: document.querySelector('.modal__link'),
+  modalCloseBtn: document.querySelector('.modal__close'),
 }
 
 const showPreloader = () => {
@@ -462,15 +355,18 @@ const app = () => {
       overview,
       homepage
     } = data;
-    const modalContent = new Modal(id, title, poster_path, genres, vote_average, overview, homepage);
-    modal.textContent = '';
-    modal.classList.toggle('modal--show')
-    modal.append(modalContent.renderModal());
+    const modalInfo = new Modal(id, title, poster_path, genres, vote_average, overview, homepage);
+    modal.modalTitle.textContent = modalInfo.get('title');
+    modal.modalPoster.src = modalInfo.getImgPath(poster_path);
+    modal.modalGenresList.innerHTML = modalInfo.getGenresList();
+    modal.modalRating.textContent = modalInfo.get('vote_average');
+    modal.modalOverview.textContent = modalInfo.get('overview');
+    modal.modalLink.textContent = modalInfo.get('homepage');
+    modal.main.classList.toggle('modal--show');
     hidePreloader();
-    const modalCloseBtn = modal.querySelector('.modal__close');
-    modalCloseBtn.addEventListener('click', (e) => {
+    modal.modalCloseBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      modal.classList.toggle('modal--show')
+      modal.main.classList.remove('modal--show')
     })
   }
 
@@ -545,7 +441,7 @@ const app = () => {
     }
   }
 
-  // getData('marvel', state);
+  getData('marvel', state);
   moveHeader();
   filters.forEach(((filter) => {
     filter.addEventListener('click', filtersClickHandle);
@@ -558,3 +454,126 @@ const app = () => {
 }
 
 app();
+
+Modal = class {
+  constructor(id, title, poster_path, genres, vote_average, overview, homepage) {
+    this.id = id;
+    this.title = title;
+    this.poster_path = poster_path;
+    this.genres = genres;
+    this.vote_average = vote_average;
+    this.overview = overview;
+    this.homepage = homepage;
+  }
+
+
+
+  getNoPosterImgPath = () => 'img/No_image_available.svg';
+  getApiKey = () => '20ba111713def543aaca200d5d47a284';
+  getUrl = () => 'https://image.tmdb.org/t/p/w300_and_h450_bestv2/';
+
+  getImgPath = (poster_path) => {
+    const posterImg = (poster_path) ? this.getUrl() + poster_path : this.getNoPosterImgPath();
+    return posterImg;
+  }
+
+  getGenresList = () => this.genres.reduce((acc, {
+    name
+  }, index, arr) => {
+    const separator = (index !== arr.length - 1) ? ', ' : '';
+    return `${acc}${name}${separator}`
+  }, '');
+
+  getHomePage = () => {
+    const homePage = (this.homepage) ? `<a class="modal__link" href="${this.homepage}" target="_blanc">Официальная страница</a>` : '';
+    return homePage
+  }
+
+  renderModal = () => {
+    const modal = document.querySelector('.modal');
+    return modal;
+  }
+
+  renderModal2 = (fragment) => {
+    const modalContent = document.createElement('div');
+    modalContent.className = 'modal__content';
+    modalContent.innerHTML = `
+      <div class="modal__poster-wrapper">
+        <img src="${this.getImgPath(this.poster_path)}" alt="" class="modal__poster">
+      </div>
+      <div class="modal__info">
+        <h2 class="modal__title">
+          ${this.title}
+        </h2>
+        <div class="modal__genres">
+          <h3>Жанр:</h3>
+          <p class="modal__genres-list">
+            ${this.getGenresList()}
+          </p>
+        </div>
+        <div>
+          <h3>Рейтинг</h3>
+          <span class="modal__rating">${this.vote_average}</span>
+        </div>
+        <div class="header__info">
+          <h3 dir="auto">Обзор: </h3>
+          <div class="overview" dir="auto">
+            <p class="description">
+            ${this.overview}
+            </p>
+          </div>
+          <p class="modal__link-wrapper">
+            ${this.getHomePage()}
+          </p>
+          <div class="modal__close"></div>
+        </div>
+      </div>
+      `
+    return modalContent;
+  }
+
+  get = (value) => {
+    return `${this[value]}`
+  };
+
+  showInfo = () => {
+    console.log(this.title, this.id);
+  }
+}
+
+const Movie = class {
+  constructor(id, title, popularity, genres, overview, poster_path, backdrop_path, release_date, vote_average) {
+    this.id = id;
+    this.title = title;
+    this.popularity = popularity;
+    this.genres = genres;
+    this.overview = overview;
+    this.poster_path = poster_path;
+    this.backdrop_path = backdrop_path;
+    this.release_date = release_date;
+    this.vote_average = vote_average;
+  }
+
+  getNoPosterImgPath = () => 'img/No_image_available.svg';
+  getApiKey = () => '20ba111713def543aaca200d5d47a284';
+  getUrl = () => 'https://image.tmdb.org/t/p/w185_and_h278_bestv2';
+  getImgPath = (poster_path) => {
+    const posterImg = (poster_path) ? this.getUrl() + poster_path : this.getNoPosterImgPath();
+    return posterImg;
+  }
+
+  renderMovieCard = () => {
+    const card = document.createElement('li');
+    card.classList.add('movies__item');
+    card.dataset.id = this.id;
+    const voteElem = (this.vote_average) ? `<span class="card__vote">${this.vote_average}</span>` : ''
+    card.innerHTML = `
+    <a href="#" class="movies__card card">
+          ${voteElem}
+          <img src="${this.getImgPath(this.poster_path)}" alt="${this.title}" class="card__img">
+          <h3 class="card__title">${this.title}</h3>
+        </a>
+    `;
+    return card;
+  }
+}
