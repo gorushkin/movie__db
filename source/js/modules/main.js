@@ -6,6 +6,7 @@ const filters = document.querySelectorAll('.js__filter');
 const resultTabs = document.querySelectorAll('.search__result');
 
 const elements = {
+  body: document.body,
   header: document.querySelector('.header'),
   headerContent: document.querySelector('.header__content'),
   moviesList: document.querySelector('.movies__list'),
@@ -13,7 +14,8 @@ const elements = {
   moviesPaginationList: document.querySelector('.movies__pagination-list'),
   moviesSizeList: document.querySelector('.movies__size-list'),
   preloader: document.querySelector('.preloader'),
-}
+  filters: document.querySelector('.filters'),
+};
 
 const modal = {
   main: document.querySelector('.modal'),
@@ -28,11 +30,11 @@ const modal = {
 
 const showPreloader = () => {
   elements.preloader.style.display = 'flex';
-}
+};
 
 const hidePreloader = () => {
   elements.preloader.style.display = 'none';
-}
+};
 
 const app = () => {
   const getBtnsParametrs = {
@@ -86,7 +88,6 @@ const app = () => {
       const minIndex = Math.min(pageCount - 3, (Math.max(2, state.currentPage - 1)));
       const maxIndex = Math.max(4, (Math.min(state.currentPage + 1, pageCount - 1)))
       for (i = minIndex; i <= maxIndex; i += 1) {
-        console.log(state.currentPage);
         if (state.currentPage >= 4 && i === minIndex) {
           fragment.append(buildPaginationItem(i, 'first'));
         } else if (state.currentPage <= pageCount - 3 && i === maxIndex) {
@@ -144,6 +145,7 @@ const app = () => {
   }
 
   const render = () => {
+
     hidePreloader();
     renderList('moviesList');
     renderList('tvShowsList');
@@ -251,9 +253,13 @@ const app = () => {
     modal.modalLink.textContent = modalInfo.get('homepage');
     modal.main.classList.toggle('modal--show');
     hidePreloader();
+    elements.body.style.overflow = 'hidden';
+    console.log(elements.body);
     modal.modalCloseBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      modal.main.classList.remove('modal--show')
+      modal.main.classList.remove('modal--show');
+      elements.body.style.overflow = '';
+
     })
   }
 
@@ -285,8 +291,8 @@ const app = () => {
 
   const start = () => {
     if (state.start) {
-      console.log(elements.header);
       elements.header.classList.remove('header--fullheight');
+      elements.filters.classList.remove('hide');
       elements.headerContent.style.transform = '';
     }
   }
@@ -296,10 +302,11 @@ const app = () => {
     const formData = new FormData(e.target);
     const searchValue = formData.get('search').trim();
     form.elements.search.value = '';
-    getData(searchValue);
+    form.elements.search.blur();
     state.start = true;
     start();
     state.query = searchValue;
+    getData(searchValue);
   }
 
   const moveHeader = () => {
@@ -328,7 +335,7 @@ const app = () => {
     }
   }
 
-  getData('marvel', state);
+  // getData('marvel', state);
   moveHeader();
   filters.forEach(((filter) => {
     filter.addEventListener('click', filtersClickHandle);

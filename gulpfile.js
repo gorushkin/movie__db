@@ -16,6 +16,8 @@ import ttf2woff2 from 'gulp-ttf2woff2';
 import otf2woff from 'gulp-fonter';
 import css from './gulp/css.js';
 import path from './gulp/path.js';
+import sourcemaps from 'gulp-sourcemaps';
+
 
 const root = pathNpm.resolve();
 // const name = pathNpm.basename(root);
@@ -83,7 +85,9 @@ const js = () => {
     .pipe(concat('vendor.js'))
     .pipe(gulp.dest(path.build.js));
   return gulp.src(path.src.jsModules)
+    .pipe(sourcemaps.init())
     .pipe(concat('main.js'))
+    .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(path.build.js));
 }
 
