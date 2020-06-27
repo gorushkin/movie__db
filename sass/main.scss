@@ -2,6 +2,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  position: relative;
 }
 
 .wrapper {
@@ -42,9 +43,16 @@ body {
   }
 }
 
+.filters {
+  display: block;
+
+  &.hide {
+    display: none;
+  }
+}
+
 .filter__row {
   display: flex;
-  display: none;
   flex-wrap: nowrap;
   justify-content: space-between;
 

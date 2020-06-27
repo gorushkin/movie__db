@@ -2,7 +2,9 @@
   display: none;
   // display: flex;
   position: fixed;
+  overflow-y: auto;
   top: 0;
+  bottom: 0;
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -24,6 +26,9 @@
   max-width: 1200px;
   margin: 0 auto;
   position: relative;
+  outline: 2px solid blue;
+  overflow-y: auto;
+  height: 100%;
 }
 
 .modal__title {
@@ -51,6 +56,10 @@
 .modal__info-block {
   margin-bottom: 50px;
   display: flex;
+}
+
+.temp {
+  margin-top: 500px;
 }
 
 .modal__close {

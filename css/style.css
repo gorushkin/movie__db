@@ -495,6 +495,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100vh;
+  position: relative;
 }
 
 .wrapper {
@@ -546,9 +547,16 @@ body {
   color: #ffffff;
 }
 
+.filters {
+  display: block;
+}
+
+.filters.hide {
+  display: none;
+}
+
 .filter__row {
   display: flex;
-  display: none;
   flex-wrap: nowrap;
   justify-content: space-between;
 }
@@ -915,7 +923,9 @@ body {
 .modal {
   display: none;
   position: fixed;
+  overflow-y: auto;
   top: 0;
+  bottom: 0;
   justify-content: center;
   align-items: center;
   width: 100%;
@@ -937,6 +947,9 @@ body {
   max-width: 1200px;
   margin: 0 auto;
   position: relative;
+  outline: 2px solid blue;
+  overflow-y: auto;
+  height: 100%;
 }
 
 .modal__title {
@@ -964,6 +977,10 @@ body {
 .modal__info-block {
   margin-bottom: 50px;
   display: flex;
+}
+
+.temp {
+  margin-top: 500px;
 }
 
 .modal__close {
