@@ -262,21 +262,21 @@ const app = () => {
     } = data;
     const modalInfo = new Modal(id, title, poster_path, genres, vote_average, overview, homepage);
     modal.modalTitle.textContent = modalInfo.get('title');
+    modal.modalPoster.addEventListener('load', (e) => {
+      hidePreloader();
+    })
     modal.modalPoster.src = modalInfo.getImgPath(poster_path);
-    console.log(modalInfo.getGenresList());
     modal.modalGenresList.innerHTML = modalInfo.getGenresList();
     modal.modalRating.textContent = modalInfo.get('vote_average');
     modal.modalOverview.textContent = modalInfo.get('overview');
-    modal.modalLink.textContent = modalInfo.get('homepage');
+    modal.modalLink.href = modalInfo.get('homepage');
+    console.log(modalInfo.get('homepage'));
     modal.main.classList.toggle('modal--show');
-    hidePreloader();
     elements.body.style.overflow = 'hidden';
-    console.log(elements.body);
     modal.modalCloseBtn.addEventListener('click', (e) => {
       e.preventDefault();
       modal.main.classList.remove('modal--show');
       elements.body.style.overflow = '';
-
     })
   }
 
