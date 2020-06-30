@@ -19,18 +19,8 @@ const elements = {
   filtersTitle: document.querySelector('.filters__title'),
   tabsPanel: document.querySelector('.movies__tab'),
   tabsTitles: document.querySelectorAll('.movies__tab-item'),
+  modal: document.querySelector('.modal'),
 };
-
-const modal = {
-  main: document.querySelector('.modal'),
-  modalTitle: document.querySelector('.modal__title'),
-  modalPoster: document.querySelector('.modal__poster'),
-  modalGenresList: document.querySelector('.modal__genres-list'),
-  modalRating: document.querySelector('.modal__rating'),
-  modalOverview: document.querySelector('.modal__overview'),
-  modalLink: document.querySelector('.modal__link'),
-  modalCloseBtn: document.querySelector('.modal__close'),
-}
 
 const showPreloader = () => {
   elements.preloader.style.display = 'flex';
@@ -260,22 +250,16 @@ const app = () => {
       overview,
       homepage
     } = data;
-    const modalInfo = new Modal(id, title, poster_path, genres, vote_average, overview, homepage);
-    modal.modalTitle.textContent = modalInfo.get('title');
-    modal.modalPoster.addEventListener('load', (e) => {
-      hidePreloader();
-    })
-    modal.modalPoster.src = modalInfo.getImgPath(poster_path);
-    modal.modalGenresList.innerHTML = modalInfo.getGenresList();
-    modal.modalRating.textContent = modalInfo.get('vote_average');
-    modal.modalOverview.textContent = modalInfo.get('overview');
-    modal.modalLink.href = modalInfo.get('homepage');
-    console.log(modalInfo.get('homepage'));
-    modal.main.classList.toggle('modal--show');
+    const modalContent = new Modal(id, title, poster_path, genres, vote_average, overview, homepage);
+    elements.modal.innerHTML = '';
+    elements.modal.append(modalContent.render());
+    hidePreloader();
+    elements.modal.classList.toggle('modal--show');
     elements.body.style.overflow = 'hidden';
-    modal.modalCloseBtn.addEventListener('click', (e) => {
+    const modalCloseBtn = elements.modal.querySelector('.modal__close');
+    modalCloseBtn.addEventListener('click', (e) => {
       e.preventDefault();
-      modal.main.classList.remove('modal--show');
+      elements.modal.classList.remove('modal--show');
       elements.body.style.overflow = '';
     })
   }
@@ -365,7 +349,7 @@ const app = () => {
   }
 
   moveHeader();
-  // getData('marvel', state);
+  getData('marvel', state);
   filters.forEach(((filter) => {
     filter.addEventListener('click', filtersClickHandle);
   }))
