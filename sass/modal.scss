@@ -26,9 +26,11 @@
   max-width: 1200px;
   margin: 0 auto;
   position: relative;
-  outline: 2px solid blue;
   overflow-y: auto;
-  height: 100%;
+
+  h3 {
+    margin-bottom: 10px;
+  }
 }
 
 .modal__title {
@@ -51,18 +53,22 @@
   display: flex;
   flex-direction: column;
   padding: 0 30px;
+  justify-content: space-between;
 }
 
 .modal__info-block {
-  margin-bottom: 50px;
-  display: flex;
-  align-items: flex-end;
+  margin-bottom: 30px;
 }
 
 .modal__genres-list {
-  vertical-align: baseline;
+  line-height: 28px;
 }
 
+.modal__link {
+  &:hover {
+    text-decoration: underline;
+  }
+}
 
 .modal__close {
   position: absolute;
