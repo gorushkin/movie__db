@@ -87,11 +87,11 @@ const DBservice = class {
     return modifiedData;
   }
 
-  getmoviesList = (query, language) => {
+  getmoviesList = async (query, language) => {
     this.temp = `${this.getServerPath()}/search/movie?api_key=${this.getApiKey()}&language=${language}&query=${query}`;
-    const result = this.getData(this.temp)
-      .then(this.generateFullData('moviesList'))
-    return result;
+    const result = await this.getData(this.temp);
+    const rebuildedData = await this.generateFullData('moviesList')(result);
+    return rebuildedData;
   };
 
   gettvShowsList = (query, language) => {
