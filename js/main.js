@@ -128,6 +128,10 @@ const elements = {
   moviesSizeList: document.querySelector('.movies__size-list'),
   preloader: document.querySelector('.preloader'),
   filters: document.querySelector('.filters'),
+  filter: document.querySelectorAll('.filter'),
+  filtersTitle: document.querySelector('.filters__title'),
+  tabsPanel: document.querySelector('.movies__tab'),
+  tabsTitles: document.querySelectorAll('.movies__tab-item'),
 };
 
 const modal = {
@@ -227,6 +231,17 @@ const app = () => {
     return [firstIndex, lastIndex];
   }
 
+  const renderTabTitles = () => {
+    const actions = {
+      moviesList: () => `Movies (${state.moviesList.length})`,
+      tvShowsList: () => `TV Shows (${state.tvShowsList.length})`,
+    }
+    elements.tabsTitles.forEach((tab) => {
+      const tabName = tab.dataset.type;
+      tab.innerText = actions[tabName]();
+    })
+  }
+
   const renderList = (listName) => {
     const [firstIndex, lastIndex] = getCurrentPageMovieList(listName);
     elements[listName].textContent = '';
@@ -262,6 +277,7 @@ const app = () => {
     hidePreloader();
     renderList('moviesList');
     renderList('tvShowsList');
+    renderTabTitles();
     renderPaginationList(state.sorting.type);
 
   }
@@ -360,6 +376,7 @@ const app = () => {
     const modalInfo = new Modal(id, title, poster_path, genres, vote_average, overview, homepage);
     modal.modalTitle.textContent = modalInfo.get('title');
     modal.modalPoster.src = modalInfo.getImgPath(poster_path);
+    console.log(modalInfo.getGenresList());
     modal.modalGenresList.innerHTML = modalInfo.getGenresList();
     modal.modalRating.textContent = modalInfo.get('vote_average');
     modal.modalOverview.textContent = modalInfo.get('overview');
@@ -395,6 +412,8 @@ const app = () => {
 
   const getData = async (query) => {
     showPreloader();
+    state.start = true;
+    start();
     const moviesList = await new DBservice().getmoviesList(query, state.sorting.lang);
     const tvShowsList = await new DBservice().gettvShowsList(query, state.sorting.lang);
     state.moviesList = moviesList;
@@ -406,6 +425,7 @@ const app = () => {
     if (state.start) {
       elements.header.classList.remove('header--fullheight');
       elements.filters.classList.remove('hide');
+      elements.tabsPanel.classList.remove('hide');
       elements.headerContent.style.transform = '';
     }
   }
@@ -416,10 +436,19 @@ const app = () => {
     const searchValue = formData.get('search').trim();
     form.elements.search.value = '';
     form.elements.search.blur();
-    state.start = true;
-    start();
+    // state.start = true;
+    // start();
     state.query = searchValue;
     getData(searchValue);
+  }
+
+  const filtersTitleHandler = (e) => {
+    console.log('sdfgsdfg');
+    console.log(elements.filter);
+    e.preventDefault();
+    elements.filter.forEach(item => {
+      item.classList.toggle('hide');
+    })
   }
 
   const moveHeader = () => {
@@ -448,8 +477,8 @@ const app = () => {
     }
   }
 
-  // getData('marvel', state);
   moveHeader();
+  // getData('marvel', state);
   filters.forEach(((filter) => {
     filter.addEventListener('click', filtersClickHandle);
   }))
@@ -458,6 +487,7 @@ const app = () => {
   elements.moviesSizeList.addEventListener('click', navigationListClickHandler);
   elements.moviesSizeList.style.display = 'none';
   form.addEventListener('submit', formHandler);
+  elements.filtersTitle.addEventListener('click', filtersTitleHandler);
 }
 
 app();
