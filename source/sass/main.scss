@@ -13,6 +13,7 @@ body {
   justify-content: center;
   transition: all 0.3s;
   position: relative;
+  margin-bottom: 15px;
 
   &--fullheight {
     height: 100vh;
@@ -51,6 +52,8 @@ body {
   }
 }
 
+
+
 .filter__row {
   display: flex;
   flex-wrap: nowrap;
@@ -58,6 +61,27 @@ body {
 
   &.show {
     display: flex;
+  }
+}
+
+.filters__title {
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.filter {
+  // display: none;
+  transition: all 0.1s;
+  transform: scale(0);
+  height: 0;
+
+  &.hide {
+    display: block;
+    transform: scale(1);
+    height: auto;
   }
 }
 
@@ -92,20 +116,7 @@ body {
   }
 }
 
-.filter--type {
-  padding-top: 50px;
 
-  ul {
-    display: flex;
-    flex-wrap: wrap;
-  }
-
-  a {
-    font-size: 25px;
-    margin-right: 15px;
-    font-weight: 700;
-  }
-}
 
 .filter__link {
   &.active {

@@ -56,11 +56,13 @@
 .modal__info-block {
   margin-bottom: 50px;
   display: flex;
+  align-items: flex-end;
 }
 
-.temp {
-  margin-top: 500px;
+.modal__genres-list {
+  vertical-align: baseline;
 }
+
 
 .modal__close {
   position: absolute;
