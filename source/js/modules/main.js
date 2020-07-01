@@ -248,9 +248,10 @@ const app = () => {
       genres,
       vote_average,
       overview,
-      homepage
+      homepage,
+      release_date
     } = data;
-    const modalContent = new Modal(id, title, poster_path, genres, vote_average, overview, homepage);
+    const modalContent = new Modal(id, title, poster_path, genres, vote_average, overview, homepage, release_date);
     elements.modal.innerHTML = '';
     elements.modal.append(modalContent.render());
     hidePreloader();
@@ -314,8 +315,6 @@ const app = () => {
   }
 
   const filtersTitleHandler = (e) => {
-    console.log('sdfgsdfg');
-    console.log(elements.filter);
     e.preventDefault();
     elements.filter.forEach(item => {
       item.classList.toggle('hide');
@@ -349,7 +348,7 @@ const app = () => {
   }
 
   moveHeader();
-  getData('marvel', state);
+  // getData('marvel', state);
   filters.forEach(((filter) => {
     filter.addEventListener('click', filtersClickHandle);
   }))
