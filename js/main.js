@@ -69,7 +69,7 @@ const DBservice = class {
     return this.getData(this.temp);
   };
 
-  generateFullData = (type) => async (data) => {
+  generateFullData = async (type, data) => {
     const fullData = [];
     const pagesCount = data.total_pages;
     const currentPageResults = data.results;
@@ -89,37 +89,32 @@ const DBservice = class {
 
   getmoviesList = async (query, language) => {
     this.temp = `${this.getServerPath()}/search/movie?api_key=${this.getApiKey()}&language=${language}&query=${query}`;
-    const result = await this.getData(this.temp);
-    const rebuildedData = await this.generateFullData('moviesList')(result);
-    return rebuildedData;
+    const data = await this.getData(this.temp);
+    return await this.generateFullData('moviesList', data);
   };
 
-  gettvShowsList = (query, language) => {
+  gettvShowsList = async (query, language) => {
     this.temp = `${this.getServerPath()}/search/tv?api_key=${this.getApiKey()}&language=${language}&query=${query}`;
-    const result = this.getData(this.temp)
-      .then(this.generateFullData('tvShowsList'))
-    return result;
+    const data = await this.getData(this.temp);
+    return await this.generateFullData('tvShowsList', data);
   };
 
   getNextPage = (page) => {
     return this.getData(`${this.temp}&page=${page}`);
   }
 
-  getItemInfo = (id, itemType, type, language) => {
-    const result = this.getData(`${this.getServerPath()}/${itemType}/${id}?api_key=${this.getApiKey()}&language=${language}`).then(this.rebuildActions[type]);
-    return result;
+  getItemInfo = async (id, itemType, type, language) => {
+    const data = await this.getData(`${this.getServerPath()}/${itemType}/${id}?api_key=${this.getApiKey()}&language=${language}`);
+    return this.rebuildActions[type](data);
   }
 }
 
-const form = document.querySelector('.header__form');
-const movies = document.querySelector('.movies');
-const moviesList = document.querySelector('.movies__list');
-const tvShowsList = document.querySelector('.tvshows__list');
-const filters = document.querySelectorAll('.js__filter');
-const resultTabs = document.querySelectorAll('.search__result');
-
 const elements = {
+  form: document.querySelector('.header__form'),
+  movies: document.querySelector('.movies'),
   body: document.body,
+  resultTabs: document.querySelectorAll('.search__result'),
+  jsFilters: document.querySelectorAll('.js__filter'),
   header: document.querySelector('.header'),
   headerContent: document.querySelector('.header__content'),
   moviesList: document.querySelector('.movies__list'),
@@ -269,7 +264,6 @@ const app = () => {
     renderList('tvShowsList');
     renderTabTitles();
     renderPaginationList(state.sorting.type);
-
   }
 
   const filtersActions = {
@@ -277,7 +271,7 @@ const app = () => {
       getData(state.query, state);
     },
     type: () => {
-      resultTabs.forEach((tab) => {
+      elements.resultTabs.forEach((tab) => {
         tab.classList.remove('search__result--active');
         if (tab.id === state.sorting.type) {
           tab.classList.add('search__result--active');
@@ -361,9 +355,10 @@ const app = () => {
       genres,
       vote_average,
       overview,
-      homepage
+      homepage,
+      release_date
     } = data;
-    const modalContent = new Modal(id, title, poster_path, genres, vote_average, overview, homepage);
+    const modalContent = new Modal(id, title, poster_path, genres, vote_average, overview, homepage, release_date);
     elements.modal.innerHTML = '';
     elements.modal.append(modalContent.render());
     hidePreloader();
@@ -418,22 +413,19 @@ const app = () => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const searchValue = formData.get('search').trim();
-    form.elements.search.value = '';
-    form.elements.search.blur();
-    // state.start = true;
-    // start();
+    elements.form.elements.search.value = '';
+    elements.form.elements.search.placeholder = searchValue;
+    elements.form.elements.search.blur();
     state.query = searchValue;
     getData(searchValue);
   }
 
-  const filtersTitleHandler = (e) => {
-    console.log('sdfgsdfg');
-    console.log(elements.filter);
-    e.preventDefault();
-    elements.filter.forEach(item => {
-      item.classList.toggle('hide');
-    })
-  }
+  // const filtersTitleHandler = (e) => {
+  //   e.preventDefault();
+  //   elements.filter.forEach(item => {
+  //     item.classList.toggle('hide');
+  //   })
+  // }
 
   const moveHeader = () => {
     const windowHeight = window.innerHeight;
@@ -462,22 +454,22 @@ const app = () => {
   }
 
   moveHeader();
-  getData('marvel', state);
-  filters.forEach(((filter) => {
+  // getData('marvel', state);
+  elements.jsFilters.forEach(((filter) => {
     filter.addEventListener('click', filtersClickHandle);
   }))
-  movies.addEventListener('click', itemClickHandler);
+  elements.movies.addEventListener('click', itemClickHandler);
   elements.moviesPaginationList.addEventListener('click', navigationListClickHandler);
   elements.moviesSizeList.addEventListener('click', navigationListClickHandler);
   elements.moviesSizeList.style.display = 'none';
-  form.addEventListener('submit', formHandler);
-  elements.filtersTitle.addEventListener('click', filtersTitleHandler);
+  elements.form.addEventListener('submit', formHandler);
+  // elements.filtersTitle.addEventListener('click', filtersTitleHandler);
 }
 
 app();
 
 Modal = class {
-  constructor(id, title, poster_path, genres, vote_average, overview, homepage) {
+  constructor(id, title, poster_path, genres, vote_average, overview, homepage, release_date) {
     this.id = id;
     this.title = title;
     this.poster_path = poster_path;
@@ -485,14 +477,15 @@ Modal = class {
     this.vote_average = vote_average;
     this.overview = overview;
     this.homepage = homepage;
+    this.release_date = release_date;
   }
 
   getNoPosterImgPath = () => 'img/No_image_available.svg';
   getApiKey = () => '20ba111713def543aaca200d5d47a284';
   getUrl = () => 'https://image.tmdb.org/t/p/w300_and_h450_bestv2/';
 
-  getImgPath = (poster_path) => {
-    const posterImg = (poster_path) ? this.getUrl() + poster_path : this.getNoPosterImgPath();
+  getImgPath = () => {
+    const posterImg = (this.poster_path) ? this.getUrl() + this.poster_path : this.getNoPosterImgPath();
     return posterImg;
   }
 
@@ -508,18 +501,19 @@ Modal = class {
     return homePage
   }
 
+  getReleaseYear = () => new Date(this.release_date).getFullYear();
 
   render = () => {
     const modalContent = document.createElement('div');
     modalContent.className = 'modal__content';
     modalContent.innerHTML = `
       <div class="modal__poster-wrapper">
-        <img src="${this.getImgPath(this.poster_path)}" alt="" class="modal__poster">
+        <img src="${this.getImgPath()}" alt="" class="modal__poster">
       </div>
       <div class="modal__info">
       <div class="modal__info-wrapper">
         <h2 class="modal__title">
-          ${this.title} <span>(2019)</span>
+          ${this.title} <span>(${this.getReleaseYear()})</span>
         </h2>
         <div class="modal__genres modal__info-block">
           <h3>Жанр:</h3>

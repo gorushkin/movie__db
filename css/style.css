@@ -574,18 +574,6 @@ body {
   text-decoration: underline;
 }
 
-.filter {
-  transition: all 0.1s;
-  transform: scale(0);
-  height: 0;
-}
-
-.filter.hide {
-  display: block;
-  transform: scale(1);
-  height: auto;
-}
-
 .filter__lang-list {
   display: flex;
 }

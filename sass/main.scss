@@ -52,8 +52,6 @@ body {
   }
 }
 
-
-
 .filter__row {
   display: flex;
   flex-wrap: nowrap;
@@ -69,19 +67,6 @@ body {
 
   &:hover {
     text-decoration: underline;
-  }
-}
-
-.filter {
-  // display: none;
-  transition: all 0.1s;
-  transform: scale(0);
-  height: 0;
-
-  &.hide {
-    display: block;
-    transform: scale(1);
-    height: auto;
   }
 }
 
