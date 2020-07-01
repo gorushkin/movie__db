@@ -69,7 +69,7 @@ const DBservice = class {
     return this.getData(this.temp);
   };
 
-  generateFullData = (type) => async (data) => {
+  generateFullData = async (type, data) => {
     const fullData = [];
     const pagesCount = data.total_pages;
     const currentPageResults = data.results;
@@ -89,24 +89,22 @@ const DBservice = class {
 
   getmoviesList = async (query, language) => {
     this.temp = `${this.getServerPath()}/search/movie?api_key=${this.getApiKey()}&language=${language}&query=${query}`;
-    const result = await this.getData(this.temp);
-    const rebuildedData = await this.generateFullData('moviesList')(result);
-    return rebuildedData;
+    const data = await this.getData(this.temp);
+    return await this.generateFullData('moviesList', data);
   };
 
-  gettvShowsList = (query, language) => {
+  gettvShowsList = async (query, language) => {
     this.temp = `${this.getServerPath()}/search/tv?api_key=${this.getApiKey()}&language=${language}&query=${query}`;
-    const result = this.getData(this.temp)
-      .then(this.generateFullData('tvShowsList'))
-    return result;
+    const data = await this.getData(this.temp);
+    return await this.generateFullData('tvShowsList', data);
   };
 
   getNextPage = (page) => {
     return this.getData(`${this.temp}&page=${page}`);
   }
 
-  getItemInfo = (id, itemType, type, language) => {
-    const result = this.getData(`${this.getServerPath()}/${itemType}/${id}?api_key=${this.getApiKey()}&language=${language}`).then(this.rebuildActions[type]);
-    return result;
+  getItemInfo = async (id, itemType, type, language) => {
+    const data = await this.getData(`${this.getServerPath()}/${itemType}/${id}?api_key=${this.getApiKey()}&language=${language}`);
+    return this.rebuildActions[type](data);
   }
 }

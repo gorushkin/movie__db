@@ -1,12 +1,9 @@
-const form = document.querySelector('.header__form');
-const movies = document.querySelector('.movies');
-const moviesList = document.querySelector('.movies__list');
-const tvShowsList = document.querySelector('.tvshows__list');
-const filters = document.querySelectorAll('.js__filter');
-const resultTabs = document.querySelectorAll('.search__result');
-
 const elements = {
+  form: document.querySelector('.header__form'),
+  movies: document.querySelector('.movies'),
   body: document.body,
+  resultTabs: document.querySelectorAll('.search__result'),
+  jsFilters: document.querySelectorAll('.js__filter'),
   header: document.querySelector('.header'),
   headerContent: document.querySelector('.header__content'),
   moviesList: document.querySelector('.movies__list'),
@@ -156,7 +153,6 @@ const app = () => {
     renderList('tvShowsList');
     renderTabTitles();
     renderPaginationList(state.sorting.type);
-
   }
 
   const filtersActions = {
@@ -164,7 +160,7 @@ const app = () => {
       getData(state.query, state);
     },
     type: () => {
-      resultTabs.forEach((tab) => {
+      elements.resultTabs.forEach((tab) => {
         tab.classList.remove('search__result--active');
         if (tab.id === state.sorting.type) {
           tab.classList.add('search__result--active');
@@ -306,20 +302,19 @@ const app = () => {
     e.preventDefault();
     const formData = new FormData(e.target);
     const searchValue = formData.get('search').trim();
-    form.elements.search.value = '';
-    form.elements.search.blur();
-    // state.start = true;
-    // start();
+    elements.form.elements.search.value = '';
+    elements.form.elements.search.placeholder = searchValue;
+    elements.form.elements.search.blur();
     state.query = searchValue;
     getData(searchValue);
   }
 
-  const filtersTitleHandler = (e) => {
-    e.preventDefault();
-    elements.filter.forEach(item => {
-      item.classList.toggle('hide');
-    })
-  }
+  // const filtersTitleHandler = (e) => {
+  //   e.preventDefault();
+  //   elements.filter.forEach(item => {
+  //     item.classList.toggle('hide');
+  //   })
+  // }
 
   const moveHeader = () => {
     const windowHeight = window.innerHeight;
@@ -348,16 +343,16 @@ const app = () => {
   }
 
   moveHeader();
-  // getData('marvel', state);
-  filters.forEach(((filter) => {
+  getData('marvel', state);
+  elements.jsFilters.forEach(((filter) => {
     filter.addEventListener('click', filtersClickHandle);
   }))
-  movies.addEventListener('click', itemClickHandler);
+  elements.movies.addEventListener('click', itemClickHandler);
   elements.moviesPaginationList.addEventListener('click', navigationListClickHandler);
   elements.moviesSizeList.addEventListener('click', navigationListClickHandler);
   elements.moviesSizeList.style.display = 'none';
-  form.addEventListener('submit', formHandler);
-  elements.filtersTitle.addEventListener('click', filtersTitleHandler);
+  elements.form.addEventListener('submit', formHandler);
+  // elements.filtersTitle.addEventListener('click', filtersTitleHandler);
 }
 
 app();

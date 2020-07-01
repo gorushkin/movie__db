@@ -1,5 +1,5 @@
 Modal = class {
-  constructor(id, title, poster_path, genres, vote_average, overview, homepage) {
+  constructor(id, title, poster_path, genres, vote_average, overview, homepage, release_date) {
     this.id = id;
     this.title = title;
     this.poster_path = poster_path;
@@ -7,14 +7,15 @@ Modal = class {
     this.vote_average = vote_average;
     this.overview = overview;
     this.homepage = homepage;
+    this.release_date = release_date;
   }
 
   getNoPosterImgPath = () => 'img/No_image_available.svg';
   getApiKey = () => '20ba111713def543aaca200d5d47a284';
   getUrl = () => 'https://image.tmdb.org/t/p/w300_and_h450_bestv2/';
 
-  getImgPath = (poster_path) => {
-    const posterImg = (poster_path) ? this.getUrl() + poster_path : this.getNoPosterImgPath();
+  getImgPath = () => {
+    const posterImg = (this.poster_path) ? this.getUrl() + this.poster_path : this.getNoPosterImgPath();
     return posterImg;
   }
 
@@ -30,18 +31,19 @@ Modal = class {
     return homePage
   }
 
+  getReleaseYear = () => new Date(this.release_date).getFullYear();
 
   render = () => {
     const modalContent = document.createElement('div');
     modalContent.className = 'modal__content';
     modalContent.innerHTML = `
       <div class="modal__poster-wrapper">
-        <img src="${this.getImgPath(this.poster_path)}" alt="" class="modal__poster">
+        <img src="${this.getImgPath()}" alt="" class="modal__poster">
       </div>
       <div class="modal__info">
       <div class="modal__info-wrapper">
         <h2 class="modal__title">
-          ${this.title} <span>(2019)</span>
+          ${this.title} <span>(${this.getReleaseYear()})</span>
         </h2>
         <div class="modal__genres modal__info-block">
           <h3>Жанр:</h3>
