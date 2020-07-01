@@ -343,7 +343,7 @@ const app = () => {
   }
 
   moveHeader();
-  getData('marvel', state);
+  // getData('marvel', state);
   elements.jsFilters.forEach(((filter) => {
     filter.addEventListener('click', filtersClickHandle);
   }))
